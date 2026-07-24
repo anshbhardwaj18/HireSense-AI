@@ -1,0 +1,60 @@
+# =========================
+# Web Framework
+# =========================
+fastapi
+uvicorn[standard]
+
+# =========================
+# Database - PostgreSQL
+# =========================
+sqlalchemy
+psycopg[binary]
+alembic
+
+# =========================
+# Configuration & Validation
+# =========================
+pydantic
+pydantic-settings
+python-dotenv
+email-validator
+
+# =========================
+# Authentication & Security
+# =========================
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+
+# =========================
+# PDF Processing
+# =========================
+pymupdf
+
+# =========================
+# Redis
+# =========================
+redis
+
+# =========================
+# Background Tasks
+# =========================
+celery
+
+# =========================
+# HTTP Client
+# =========================
+httpx
+
+# =========================
+# AI / LLM
+# =========================
+langchain
+langchain-core
+langchain-community
+
+# =========================
+# Testing
+# =========================
+pytest
+pytest-asyncio
