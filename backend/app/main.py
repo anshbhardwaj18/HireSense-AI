@@ -1,3 +1,39 @@
 from fastapi import FastAPI
+from sqlalchemy import text
 
-app = FastAPI()
+from app.database.connection import engine
+from app.database.base import Base
+from app.models import User
+
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(
+    title="HireSense AI API",
+    description="AI-powered carrer platforom API",
+    version="1.0.0"
+)
+
+@app.get("/")
+def root():
+    return{
+        "message" : "Welome to the HireSense AI App",
+        "Status" : "Running"
+    }
+
+@app.get("/health")
+def health_check():
+    return {
+        "status" : "Healthy"
+    }
+
+@app.get("/test-db")
+def test_database():
+    with engine.connect() as connection:
+        result = connection.execute(text("SELECT 1"))
+
+    return {
+        "database": "connected",
+        "result": result.scalar()
+    }
+
+
