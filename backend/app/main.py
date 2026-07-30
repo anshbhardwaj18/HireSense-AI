@@ -4,6 +4,7 @@ from sqlalchemy import text
 from app.database.connection import engine
 from app.database.base import Base
 from app.models import User
+from app.routers.auth import router as auth_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -12,6 +13,8 @@ app = FastAPI(
     description="AI-powered carrer platforom API",
     version="1.0.0"
 )
+
+app.include_router(auth_router)
 
 @app.get("/")
 def root():
