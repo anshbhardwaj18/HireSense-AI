@@ -6,7 +6,7 @@ from app.database.base import Base
 from app.models import User
 from app.routers.auth import router as auth_router
 from app.core.config import settings
-
+from app.routers.resume import router as resume_router
 # Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -16,6 +16,7 @@ app = FastAPI(
 )
 
 app.include_router(auth_router)
+app.include_router(resume_router)
 
 @app.get("/check")
 def check():

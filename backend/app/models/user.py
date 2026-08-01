@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import DateTime, String, Boolean
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.base import Base
 
@@ -57,4 +57,10 @@ class User(Base):
     refresh_token: Mapped[str | None] = mapped_column(
         String(500),
         nullable=True
+    )
+
+    resumes = relationship(
+        "Resume",
+        back_populates="user",
+        cascade="all, delete-orphan"
     )
