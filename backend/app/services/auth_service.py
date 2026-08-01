@@ -3,7 +3,8 @@ from sqlalchemy.orm import Session
 
 from app.models.user import User
 from app.schemas.auth import UserRegister
-from app.core.security import hash_password
+from app.core.security import hash_password, verify_password
+from app.core.jwt import create_access_token
 
 
 def register_user(db: Session, user_data: UserRegister) -> User:
@@ -30,3 +31,28 @@ def register_user(db: Session, user_data: UserRegister) -> User:
     db.refresh(new_user)
 
     return new_user
+
+def login_user(
+        db : Session,
+        email : str,
+        password : str
+):
+    user = db.query(User).filter(
+        User.email == email
+    ).first()
+
+    if not user:
+        return None
+
+    if not verify_password(
+        password,
+        user.hashed_password
+    ):
+        return None
+
+    access_token = create_access_token(
+        {
+            "sub" : user.email
+        }
+    )
+    return access_token

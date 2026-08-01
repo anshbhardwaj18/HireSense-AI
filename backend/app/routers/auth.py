@@ -1,9 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-
+from fastapi.security import OAuth2PasswordRequestForm
 from app.database.session import get_db
-from app.schemas.auth import UserRegister
-from app.services.auth_service import register_user
+from app.schemas.auth import UserRegister, LoginRequest, TokenResponse
+from app.services.auth_service import register_user, login_user
+from app.dependencies.auth import get_current_user
+from app.models.user import User
+
 
 
 router = APIRouter(
@@ -40,3 +43,34 @@ def register(
             status_code=status.HTTP_409_CONFLICT,
             detail=str(error)
         )
+
+@router.post("/login", response_model=TokenResponse)
+def login(
+    form_data : OAuth2PasswordRequestForm = Depends(),
+    db : Session = Depends(get_db)
+):
+    token = login_user(
+        db,
+        form_data.username,
+        form_data.password
+    )
+
+    if not token:
+        raise HTTPException(
+            status_code=401,
+            detail= "Invalid email and password"
+        )
+    return {
+        "access_token" : token,
+        "token_type" : "bearer"
+    }
+
+@router.get("/me")
+def get_me(
+    current_user : User = Depends(get_current_user)
+):
+    return{
+        "id" : current_user.id,
+        "full_name" : current_user.full_name,
+        "email" : current_user.email
+    }
