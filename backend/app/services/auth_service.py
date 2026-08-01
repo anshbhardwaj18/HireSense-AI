@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.models.user import User
 from app.schemas.auth import UserRegister
 from app.core.security import hash_password, verify_password
-from app.core.jwt import create_access_token
+from app.core.jwt import create_access_token, create_refresh_token, decode_refresh_token
 
 
 def register_user(db: Session, user_data: UserRegister) -> User:
@@ -23,7 +23,9 @@ def register_user(db: Session, user_data: UserRegister) -> User:
         email=user_data.email,
         hashed_password=hash_password(
             user_data.password
-        )
+        ),
+        role="candidate",
+        is_active=True
     )
 
     db.add(new_user)
@@ -52,7 +54,47 @@ def login_user(
 
     access_token = create_access_token(
         {
+            "sub": user.email
+        }
+    )
+
+    refresh_token = create_refresh_token(
+        {
+            "sub": user.email
+        }
+    )
+
+    user.refresh_token = refresh_token
+
+    db.commit()
+    db.refresh(user)
+
+    return {
+        "access_token" : access_token,
+        "refresh_token" : refresh_token
+    }
+
+def refresh_access_token(db: Session, refresh_token: str):
+    payload = decode_refresh_token(refresh_token)
+
+    if not payload:
+        return None
+
+    email = payload.get("sub")
+
+    user = db.query(User).filter(
+        User.email == email
+    ).first()
+
+    if not user:
+        return None
+
+    if user.refresh_token != refresh_token:
+        return None
+
+    new_access_token = create_access_token(
+        {
             "sub" : user.email
         }
     )
-    return access_token
+    return new_access_token

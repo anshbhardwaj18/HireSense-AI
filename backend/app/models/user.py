@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, String
+from sqlalchemy import DateTime, String, Boolean
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database.base import Base
@@ -31,7 +31,30 @@ class User(Base):
         nullable=False
     )
 
+    role: Mapped[str] = mapped_column(
+        String(50),
+        default="candidate",
+        nullable=False
+    )
+
+    is_active: Mapped[bool] = mapped_column(
+        Boolean,
+        default=True,
+        nullable=False
+    )
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=datetime.utcnow
+    )
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
+
+    refresh_token: Mapped[str | None] = mapped_column(
+        String(500),
+        nullable=True
     )
