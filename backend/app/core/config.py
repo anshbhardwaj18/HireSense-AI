@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     SECRET_KEY:str
     ALGORITHM:str
     ACCESS_TOKEN_EXPIRE_MINUTES:int
+    MISTRAL_API_KEY:str
     
 
     model_config = SettingsConfigDict(
