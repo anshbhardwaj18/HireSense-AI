@@ -1,9 +1,9 @@
-from mistralai import Mistral
+from mistralai.client import MistralClient
 
 from app.core.config import settings
 
 
-client = Mistral(
+client = MistralClient(
     api_key=settings.MISTRAL_API_KEY
 )
 
