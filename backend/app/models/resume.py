@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import DateTime, ForeignKey, String, Text
+from sqlalchemy import DateTime, ForeignKey, String, Text, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.base import Base
@@ -29,6 +29,15 @@ class Resume(Base):
 
     extracted_text: Mapped[str | None] = mapped_column(
         Text,
+        nullable=True
+    )
+
+    ats_score: Mapped[int | None] = mapped_column(
+        nullable=True
+    )
+
+    analysis_result: Mapped[str | None] = mapped_column(
+        JSON,
         nullable=True
     )
 
