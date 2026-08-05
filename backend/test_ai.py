@@ -1,6 +1,6 @@
-from app.ai.mistral import generate_resume_analysis
+from app.ai.llm import llm
 
-response = generate_resume_analysis(
-    "My name is Ansh bhardwaj. I know Python, FastAPI and PostgreSQL"
+response = llm.invoke(
+    "introduce yourself in one short sentences."
 )
-print(response)
+print(response.content)

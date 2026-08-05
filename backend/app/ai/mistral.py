@@ -7,7 +7,6 @@ client = MistralClient(
     api_key=settings.MISTRAL_API_KEY
 )
 
-
 def generate_resume_analysis(
         prompt: str
 )-> str:
