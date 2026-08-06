@@ -6,6 +6,7 @@ from app.dependencies.auth import get_current_user
 from app.models.user import User
 from app.schemas.resume import ResumeResponse, ResumeAnalysisResponse, JobMatchRequest, JobMatchResponse
 from app.services.resume_service import upload_resume, get_resume_analysis, match_resume_with_job
+from app.redis.rate_limit import rate_limits
 
 router = APIRouter(
     prefix="/resume",
@@ -20,7 +21,12 @@ def upload_resume_api(file: UploadFile = File(...), db: Session = Depends(get_db
         file
     )
 
-@router.get("/{resume_id}/analysis", response_model=ResumeAnalysisResponse)
+@router.get("/{resume_id}/analysis", 
+            response_model=ResumeAnalysisResponse,
+            dependencies=[
+                Depends(rate_limits(limit=10, window=60))
+            ]
+            )
 def resume_analysis(
     resume_id: int,
     db: Session = Depends(get_db),
@@ -32,7 +38,12 @@ def resume_analysis(
         current_user
     )
 
-@router.post("/job-match", response_model=JobMatchResponse)
+@router.post("/job-match", 
+             response_model=JobMatchResponse,
+             dependencies=[
+                 Depends(rate_limits(limit=10, window=60))
+             ]
+             )
 def job_match(
     data: JobMatchRequest,
     db: Session = Depends(get_db),
