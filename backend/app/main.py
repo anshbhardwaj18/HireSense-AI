@@ -8,12 +8,23 @@ from app.routers.auth import router as auth_router
 from app.core.config import settings
 from app.routers.resume import router as resume_router
 from app.redis.connection import check_redis_connection
+from fastapi.middleware.cors import CORSMiddleware
 # Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="HireSense AI API",
     description="AI-powered carrer platforom API",
     version="1.0.0"
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(auth_router)
@@ -55,5 +66,3 @@ def test_redis():
     return {
         "redis" : check_redis_connection()
     }
-
-

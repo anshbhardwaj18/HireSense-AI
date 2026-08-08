@@ -1,10 +1,17 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, FileText, Sparkles, BarChart3, BriefcaseBusiness, Target, Zap, ShieldCheck} from "lucide-react";
+import { ArrowRight, CheckCircle2, FileText, Sparkles, BarChart3, BriefcaseBusiness, Target, Zap, ShieldCheck, Menu, X} from "lucide-react";
 import Feature from "@/components/landing/Feature";
 import HowItWorks from "@/components/landing/HowItWorks";
+import ResumeAnalysis from "@/components/landing/ResumeAnalysis";
+import JobMatching from "@/components/landing/JobMatching";
+import CTA from "@/components/landing/CTA";
+import Footer from "@/components/landing/Footer";
+import Navbar from "@/components/layout/Navbar";
 
 export default function Home() {
   return (
+   <>
+   <Navbar/>
     <main className="min-h-screen overflow-hidden bg-[#030712] text-white">
       {/* Background Glow */}
       <div className="pointer-events-none fixed inset-0 -z-10">
@@ -12,67 +19,8 @@ export default function Home() {
         <div className="absolute right-[-150px] top-[300px] h-[350px] w-[350px] rounded-full bg-blue-500/10 blur-[120px]" />
       </div>
 
-      {/* Navbar */}
-      <nav className="mx-auto flex w-full max-w-[1500px] items-center justify-between px-6 py-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-blue-500 shadow-lg shadow-violet-500/20">
-            <Sparkles className="h-5 w-5 text-white" />
-          </div>
-
-          <span className="text-xl font-bold tracking-tight">
-            HireSense<span className="text-violet-400"> AI</span>
-          </span>
-        </Link>
-
-        <div className="hidden items-center gap-8 text-sm text-gray-400 md:flex">
-          <Link
-            href="#features"
-            className="transition hover:text-white"
-          >
-            Features
-          </Link>
-
-          <Link
-            href="#how-it-works"
-            className="transition hover:text-white"
-          >
-            How It Works
-          </Link>
-
-          <Link
-            href="#pricing"
-            className="transition hover:text-white"
-          >
-            Pricing
-          </Link>
-
-          <Link
-            href="#faq"
-            className="transition hover:text-white"
-          >
-            FAQ
-          </Link>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <Link
-            href="/login"
-            className="hidden rounded-lg px-4 py-2 text-sm text-gray-300 transition hover:text-white sm:block"
-          >
-            Login
-          </Link>
-
-          <Link
-            href="/signup"
-            className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-gray-900 transition hover:bg-gray-200"
-          >
-            Get Started
-          </Link>
-        </div>
-      </nav>
-
       {/* Hero */}
-      <section className="mx-auto grid min-h-[calc(100vh-90px)] w-full max-w-[1500px] items-center gap-12 px-6 pb-20 pt-10 lg:grid-cols-2 lg:px-8 lg:pt-0">
+      <section className="mx-auto grid min-h-[calc(100vh-90px)] w-full max-w-[1500px] items-center gap-12 px-6 pb-20 pt-30 lg:grid-cols-2 lg:px-8 lg:pt-30">
         {/* Left */}
         <div className="animate-fade-up">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-2 text-sm text-violet-300">
@@ -401,6 +349,11 @@ export default function Home() {
       <div className="mx-auto h-px max-w-[1500px] bg-gradient-to-r from-transparent via-violet-500/40 to-transparent" />
       <Feature/>
       <HowItWorks/>
+      <ResumeAnalysis/>
+      <JobMatching/>
+      <CTA/>
+      <Footer/>
     </main>
+   </>
   );
 }
