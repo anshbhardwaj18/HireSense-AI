@@ -1,5 +1,6 @@
 "use client";
 import { getCurrentUser } from "@/services/api";
+import ResumeUpload from "@/components/dashboard/ResumeUpload";
 import {
   Bell,
   BriefcaseBusiness,
@@ -263,6 +264,7 @@ export default function DashboardPage() {
               Here's your career overview. Track your resume performance,
               discover skill gaps and improve your job readiness.
             </p>
+            <ResumeUpload />
           </section>
 
           {/* ================= STATS ================= */}
@@ -407,7 +409,6 @@ export default function DashboardPage() {
                 title="Analyze Resume"
                 description="Upload your resume and discover your ATS score, strengths and skill gaps."
               />
-
               <ActionCard
                 href="/dashboard/job-match"
                 icon={<BriefcaseBusiness className="h-6 w-6" />}
