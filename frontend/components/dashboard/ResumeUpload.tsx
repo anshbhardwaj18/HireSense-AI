@@ -116,6 +116,7 @@ export default function ResumeUpload() {
        * Redirect user to dashboard.
        */
       router.push(`/resume-analysis?resume_id=${data.id}`);
+      localStorage.setItem("latest_resume_id", String(data.id));
     } catch (error) {
       console.error("Resume upload error:", error);
 

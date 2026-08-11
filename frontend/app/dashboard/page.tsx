@@ -19,11 +19,32 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+type AnalysisResult = {
+  score?: number;
+  summary?: string;
+  skills?: string[];
+  missing_skills?: string[];
+  strengths?: string[];
+  suggestions?: string[];
+  recommended_roles?: string[];
+  interview_question?: string[];
+  skill_gep?: string[];
+};
+
+type ResumeAnalysis = {
+  id: number;
+  ats_score: number | null;
+  analysis_result: AnalysisResult | null;
+};
 
 export default function DashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [userName, setUserName] = useState("User");
+  const [resumeAnalysis, setResumeAnalysis] =
+  useState<ResumeAnalysis | null>(null);
+
+  const [analysisLoading, setAnalysisLoading] = useState(true);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -41,12 +62,69 @@ export default function DashboardPage() {
     fetchCurrentUser();
   }, []);
 
+  useEffect(() => {
+  const fetchResumeAnalysis = async () => {
+    try {
+      const resumeId = localStorage.getItem("latest_resume_id");
+      const token = localStorage.getItem("access_token");
+
+      if (!resumeId || !token) {
+        setAnalysisLoading(false);
+        return;
+      }
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/resume/${resumeId}/analysis`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.detail || "Failed to load resume analysis."
+        );
+      }
+
+      setResumeAnalysis(data);
+    } catch (error) {
+      console.error("Dashboard resume analysis error:", error);
+    } finally {
+      setAnalysisLoading(false);
+    }
+  };
+
+  fetchResumeAnalysis();
+}, []);
+
   const handleLogout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
 
     window.location.href = "/";
   };
+  const skillsCount =
+  resumeAnalysis?.analysis_result?.skills?.length ?? 0;
+
+const missingSkillsCount =
+  resumeAnalysis?.analysis_result?.missing_skills?.length ?? 0;
+
+const jobReadiness =
+  resumeAnalysis?.ats_score != null
+    ? Math.max(
+        0,
+        Math.min(
+          100,
+          resumeAnalysis.ats_score -
+            missingSkillsCount * 2
+        )
+      )
+    : 0;
 
   return (
     <main className="min-h-screen bg-slate-950 text-white">
@@ -272,33 +350,52 @@ export default function DashboardPage() {
             <StatCard
               icon={<Target className="h-5 w-5" />}
               title="ATS Score"
-              value="84"
+              value={
+                analysisLoading
+                  ? "..."
+                  : String(resumeAnalysis?.ats_score ?? 0)
+                }
               suffix="/100"
-              description="Strong resume"
-              trend="+8%"
+              description={
+                resumeAnalysis?.ats_score
+                  ? resumeAnalysis.ats_score >= 80
+                    ? "Excellent resume"
+                    : resumeAnalysis.ats_score >= 60
+                      ? "Good resume"
+                      : "Needs improvement"
+                  : "Upload a resume"
+              }
+              trend={
+                resumeAnalysis?.ats_score
+                  ? "AI analyzed"
+                  : "No analysis"
+              }
             />
 
             <StatCard
               icon={<FileText className="h-5 w-5" />}
               title="Resumes"
-              value="3"
-              description="Total uploaded"
-              trend="+1 this month"
+              value={resumeAnalysis ? "1" : "0"}
+              description={
+                resumeAnalysis
+                  ? "Latest resume analyzed"
+                  : "No resume uploaded"
+              }
+              trend={resumeAnalysis ? "Active" : "Upload now"}
             />
 
             <StatCard
               icon={<BriefcaseBusiness className="h-5 w-5" />}
               title="Job Match"
-              value="78"
-              suffix="%"
-              description="Average compatibility"
-              trend="+12%"
+              value="-"
+              description="Analyze a job description"
+              trend="Not Analyzed"
             />
 
             <StatCard
               icon={<TrendingUp className="h-5 w-5" />}
               title="Job Readiness"
-              value="67"
+              value={String(jobReadiness)}
               suffix="%"
               description="Career progress"
               trend="+6%"
@@ -322,7 +419,13 @@ export default function DashboardPage() {
                   </div>
 
                   <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-300">
-                    Excellent
+                     {!resumeAnalysis
+                          ? "No Resume"
+                          : (resumeAnalysis.ats_score ?? 0) >= 80
+                            ? "Excellent"
+                            : (resumeAnalysis.ats_score ?? 0) >= 60
+                              ? "Good"
+                              : "Needs Work"}
                   </span>
                 </div>
 
@@ -330,7 +433,11 @@ export default function DashboardPage() {
                   {/* Score Ring */}
                   <div className="relative flex h-40 w-40 shrink-0 items-center justify-center rounded-full bg-[conic-gradient(#8b5cf6_0deg,#3b82f6_302deg,rgba(255,255,255,0.06)_302deg)] p-[9px]">
                     <div className="flex h-full w-full flex-col items-center justify-center rounded-full bg-slate-950">
-                      <span className="text-4xl font-bold">84</span>
+                      <span className="text-4xl font-bold">
+                        {analysisLoading
+                          ? "..."
+                          : resumeAnalysis?.ats_score ?? 0}
+                      </span>
                       <span className="text-xs text-slate-600">out of 100</span>
                     </div>
                   </div>
@@ -341,7 +448,7 @@ export default function DashboardPage() {
                         Overall performance
                       </span>
 
-                      <span className="font-semibold">84%</span>
+                      <span className="font-semibold">{resumeAnalysis?.ats_score ?? 0}%</span>
                     </div>
 
                     <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/5">
@@ -382,16 +489,38 @@ export default function DashboardPage() {
               </div>
 
               <div className="mt-7 space-y-4">
-                <ProgressItem label="Resume quality" value="84%" width="84%" />
+                  <ProgressItem
+                    label="Resume quality"
+                    value={`${resumeAnalysis?.ats_score ?? 0}%`}
+                    width={`${resumeAnalysis?.ats_score ?? 0}%`}
+                  />
 
-                <ProgressItem label="Skills coverage" value="72%" width="72%" />
+                  <ProgressItem
+                    label="Skills coverage"
+                    value={
+                      resumeAnalysis?.analysis_result?.skills?.length
+                        ? `${Math.min(
+                            resumeAnalysis.analysis_result.skills.length * 10,
+                            100
+                          )}%`
+                        : "0%"
+                    }
+                    width={
+                      resumeAnalysis?.analysis_result?.skills?.length
+                        ? `${Math.min(
+                            resumeAnalysis.analysis_result.skills.length * 10,
+                            100
+                          )}%`
+                        : "0%"
+                    }
+                  />
 
-                <ProgressItem
-                  label="Job compatibility"
-                  value="78%"
-                  width="78%"
-                />
-              </div>
+                  <ProgressItem
+                    label="Job compatibility"
+                    value={`${jobReadiness}%`}
+                    width={`${jobReadiness}%`}
+                  />
+                </div>
             </div>
           </section>
 
@@ -471,18 +600,9 @@ export default function DashboardPage() {
               <h3 className="mt-1 text-xl font-bold">Skill Snapshot</h3>
 
               <div className="mt-6 flex flex-wrap gap-2.5">
-                {[
-                  "Python",
-                  "FastAPI",
-                  "React",
-                  "Next.js",
-                  "PostgreSQL",
-                  "Docker",
-                  "Git",
-                  "REST APIs",
-                  "LangChain",
-                  "Redis",
-                ].map((skill) => (
+                {(
+                  resumeAnalysis?.analysis_result?.skills ?? []
+                ).map((skill) => (
                   <span
                     key={skill}
                     className="rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-sm text-slate-400 transition hover:border-violet-400/30 hover:bg-violet-400/10 hover:text-white"
@@ -501,10 +621,24 @@ export default function DashboardPage() {
                       Skill gap detected
                     </p>
 
-                    <p className="mt-1 text-xs leading-5 text-slate-500">
-                      AI recommends improving your system design and cloud
-                      deployment skills.
-                    </p>
+                    <div className="mt-2 space-y-1">
+                      {resumeAnalysis?.analysis_result?.skill_gep?.length ? (
+                        resumeAnalysis.analysis_result.skill_gep
+                          .slice(0, 3)
+                          .map((gap, index) => (
+                            <p
+                              key={index}
+                              className="text-xs leading-5 text-slate-500"
+                            >
+                              • {gap}
+                            </p>
+                          ))
+                      ) : (
+                        <p className="text-xs leading-5 text-slate-500">
+                          Upload a resume to identify your skill gaps.
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -636,7 +770,7 @@ function ProgressItem({
       <div className="h-1.5 overflow-hidden rounded-full bg-white/5">
         <div
           className="h-full rounded-full bg-gradient-to-r from-violet-500 to-blue-500"
-          style={{ width }}
+          style={{width}}
         />
       </div>
     </div>
