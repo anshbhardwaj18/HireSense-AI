@@ -17,6 +17,8 @@ import {
   Zap,
 } from "lucide-react";
 
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
+
 /* =========================================================
    TYPES
 ========================================================= */
@@ -54,7 +56,7 @@ type AnalysisResponse = {
    COMPONENT
 ========================================================= */
 
-export default function ResumeAnalysisPage() {
+function ResumeAnalysisContent() {
   const searchParams = useSearchParams();
   const resumeId = searchParams.get("resume_id");
 
@@ -735,5 +737,13 @@ export default function ResumeAnalysisPage() {
         }
       `}</style>
     </main>
+  );
+}
+
+export default function ResumeAnalysisPage() {
+  return (
+    <ProtectedRoute>
+      <ResumeAnalysisContent />
+    </ProtectedRoute>
   );
 }

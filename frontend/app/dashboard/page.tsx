@@ -1,5 +1,7 @@
 "use client";
-import { getCurrentUser } from "@/services/api";
+
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import { useAuth } from "@/context/AuthContext";
 import ResumeUpload from "@/components/dashboard/ResumeUpload";
 import {
   Bell,
@@ -19,6 +21,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
 type Skill = {
   skill: string;
   proficiency?: string;
@@ -44,54 +48,15 @@ type ResumeAnalysis = {
   analysis_result: AnalysisResult | null;
 };
 
-export default function DashboardPage() {
+function DashboardContent() {
+  const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [userName, setUserName] = useState("User");
-  const [resumeAnalysis, setResumeAnalysis] = useState<ResumeAnalysis | null>(
-    null,
-  );
-  const [authLoading, setAuthLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
+  const [resumeAnalysis, setResumeAnalysis] = useState<ResumeAnalysis | null>(null);
   const [analysisLoading, setAnalysisLoading] = useState(true);
+  const router = useRouter();
 
-  useEffect(() => {
-  const checkAuthentication = async () => {
-    const token = localStorage.getItem("access_token");
-
-    // No token = definitely not logged in
-    if (!token) {
-      window.location.replace("/login");
-      return;
-    }
-
-    try {
-      const user = await getCurrentUser();
-
-      if (!user) {
-        throw new Error("User not authenticated");
-      }
-
-      setIsAuthenticated(true);
-
-      if (user.full_name) {
-        setUserName(user.full_name);
-      }
-    } catch (error) {
-      console.error("Authentication failed:", error);
-
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("refresh_token");
-
-      window.location.replace("/login");
-    } finally {
-      setAuthLoading(false);
-    }
-  };
-
-  checkAuthentication();
-}, []);
+  const userName = user?.full_name || "User";
 
   useEffect(() => {
     const fetchResumeAnalysis = async () => {
@@ -104,8 +69,10 @@ export default function DashboardPage() {
           return;
         }
 
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/resume/${resumeId}/analysis`,
+          `${apiUrl}/resume/${resumeId}/analysis`,
           {
             method: "GET",
             headers: {
@@ -132,15 +99,12 @@ export default function DashboardPage() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
-
-    window.location.href = "/";
+    logout();
+    router.push("/");
   };
-  const skillsCount = resumeAnalysis?.analysis_result?.skills?.length ?? 0;
 
-  const missingSkillsCount =
-    resumeAnalysis?.analysis_result?.missing_skills?.length ?? 0;
+  const skillsCount = resumeAnalysis?.analysis_result?.skills?.length ?? 0;
+  const missingSkillsCount = resumeAnalysis?.analysis_result?.missing_skills?.length ?? 0;
 
   const jobReadiness =
     resumeAnalysis?.ats_score != null
@@ -149,28 +113,6 @@ export default function DashboardPage() {
           Math.min(100, resumeAnalysis.ats_score - missingSkillsCount * 2),
         )
       : 0;
-  console.log("ANALYSIS RESULT:", resumeAnalysis?.analysis_result);
-  console.log(
-    "SKILL GAP OBJECT:",
-    resumeAnalysis?.analysis_result?.skill_gep?.[0],
-  );
-  if (authLoading) {
-  return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-950 text-white">
-      <div className="text-center">
-        <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/10 border-t-violet-500" />
-
-        <p className="mt-4 text-sm text-slate-500">
-          Checking authentication...
-        </p>
-      </div>
-    </main>
-  );
-}
-
-if (!isAuthenticated) {
-  return null;
-}
   return (
     <main className="min-h-screen bg-slate-950 text-white">
       {/* Background */}
@@ -910,5 +852,13 @@ function ActivityItem({
         <p className="mt-1 text-xs text-slate-600">{subtitle}</p>
       </div>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <ProtectedRoute>
+      <DashboardContent />
+    </ProtectedRoute>
   );
 }

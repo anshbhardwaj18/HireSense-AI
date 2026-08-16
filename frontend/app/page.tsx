@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, FileText, Sparkles, BarChart3, BriefcaseBusiness, Target, Zap, ShieldCheck, Menu, X} from "lucide-react";
 import Feature from "@/components/landing/Feature";
@@ -7,8 +9,11 @@ import JobMatching from "@/components/landing/JobMatching";
 import CTA from "@/components/landing/CTA";
 import Footer from "@/components/landing/Footer";
 import Navbar from "@/components/layout/Navbar";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Home() {
+  const { isAuthenticated } = useAuth();
+
   return (
    <>
    <Navbar/>
@@ -42,7 +47,7 @@ export default function Home() {
 
           <div className="mt-9 flex flex-col gap-4 sm:flex-row">
             <Link
-              href="/signup"
+              href={isAuthenticated ? "/dashboard" : "/signup"}
               className="group flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 px-6 py-3.5 font-semibold shadow-xl shadow-violet-600/20 transition duration-300 hover:-translate-y-1 hover:shadow-violet-600/30"
             >
               Analyze My Resume

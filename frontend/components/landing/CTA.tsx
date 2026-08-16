@@ -5,8 +5,12 @@ import {
   Sparkles,
   CheckCircle2,
 } from "lucide-react";
+import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 
 export default function CTA() {
+  const { isAuthenticated } = useAuth();
+
   return (
     <section className="relative overflow-hidden bg-[#050713] px-6 py-28">
       {/* Background effects */}
@@ -40,14 +44,17 @@ export default function CTA() {
 
           {/* CTA Button */}
           <div className="mt-9 flex justify-center">
-            <button className="group inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-semibold text-slate-900 shadow-lg shadow-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-white/20">
+            <Link
+              href={isAuthenticated ? "/dashboard" : "/signup"}
+              className="group inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-semibold text-slate-900 shadow-lg shadow-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-white/20"
+            >
               Analyze My Resume
 
               <ArrowRight
                 size={17}
                 className="transition-transform duration-300 group-hover:translate-x-1"
               />
-            </button>
+            </Link>
           </div>
 
           {/* Trust points */}
