@@ -19,10 +19,17 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+type Skill = {
+  skill: string;
+  proficiency?: string;
+  experience_years?: number;
+  projects?: string[];
+};
+
 type AnalysisResult = {
   score?: number;
   summary?: string;
-  skills?: string[];
+  skills?: (string | Skill)[];
   missing_skills?: string[];
   strengths?: string[];
   suggestions?: string[];
@@ -41,66 +48,88 @@ export default function DashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [userName, setUserName] = useState("User");
-  const [resumeAnalysis, setResumeAnalysis] =
-  useState<ResumeAnalysis | null>(null);
+  const [resumeAnalysis, setResumeAnalysis] = useState<ResumeAnalysis | null>(
+    null,
+  );
+  const [authLoading, setAuthLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const [analysisLoading, setAnalysisLoading] = useState(true);
 
   useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const user = await getCurrentUser();
+  const checkAuthentication = async () => {
+    const token = localStorage.getItem("access_token");
 
-        if (user?.full_name) {
-          setUserName(user.full_name);
-        }
-      } catch (error) {
-        console.error("Failed to fetch current user:", error);
-      }
-    };
+    // No token = definitely not logged in
+    if (!token) {
+      window.location.replace("/login");
+      return;
+    }
 
-    fetchCurrentUser();
-  }, []);
-
-  useEffect(() => {
-  const fetchResumeAnalysis = async () => {
     try {
-      const resumeId = localStorage.getItem("latest_resume_id");
-      const token = localStorage.getItem("access_token");
+      const user = await getCurrentUser();
 
-      if (!resumeId || !token) {
-        setAnalysisLoading(false);
-        return;
+      if (!user) {
+        throw new Error("User not authenticated");
       }
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/resume/${resumeId}/analysis`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      setIsAuthenticated(true);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.detail || "Failed to load resume analysis."
-        );
+      if (user.full_name) {
+        setUserName(user.full_name);
       }
-
-      setResumeAnalysis(data);
     } catch (error) {
-      console.error("Dashboard resume analysis error:", error);
+      console.error("Authentication failed:", error);
+
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+
+      window.location.replace("/login");
     } finally {
-      setAnalysisLoading(false);
+      setAuthLoading(false);
     }
   };
 
-  fetchResumeAnalysis();
+  checkAuthentication();
 }, []);
+
+  useEffect(() => {
+    const fetchResumeAnalysis = async () => {
+      try {
+        const resumeId = localStorage.getItem("latest_resume_id");
+        const token = localStorage.getItem("access_token");
+
+        if (!resumeId || !token) {
+          setAnalysisLoading(false);
+          return;
+        }
+
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/resume/${resumeId}/analysis`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.detail || "Failed to load resume analysis.");
+        }
+
+        setResumeAnalysis(data);
+      } catch (error) {
+        console.error("Dashboard resume analysis error:", error);
+      } finally {
+        setAnalysisLoading(false);
+      }
+    };
+
+    fetchResumeAnalysis();
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("access_token");
@@ -108,24 +137,40 @@ export default function DashboardPage() {
 
     window.location.href = "/";
   };
-  const skillsCount =
-  resumeAnalysis?.analysis_result?.skills?.length ?? 0;
+  const skillsCount = resumeAnalysis?.analysis_result?.skills?.length ?? 0;
 
-const missingSkillsCount =
-  resumeAnalysis?.analysis_result?.missing_skills?.length ?? 0;
+  const missingSkillsCount =
+    resumeAnalysis?.analysis_result?.missing_skills?.length ?? 0;
 
-const jobReadiness =
-  resumeAnalysis?.ats_score != null
-    ? Math.max(
-        0,
-        Math.min(
-          100,
-          resumeAnalysis.ats_score -
-            missingSkillsCount * 2
+  const jobReadiness =
+    resumeAnalysis?.ats_score != null
+      ? Math.max(
+          0,
+          Math.min(100, resumeAnalysis.ats_score - missingSkillsCount * 2),
         )
-      )
-    : 0;
+      : 0;
+  console.log("ANALYSIS RESULT:", resumeAnalysis?.analysis_result);
+  console.log(
+    "SKILL GAP OBJECT:",
+    resumeAnalysis?.analysis_result?.skill_gep?.[0],
+  );
+  if (authLoading) {
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-slate-950 text-white">
+      <div className="text-center">
+        <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/10 border-t-violet-500" />
 
+        <p className="mt-4 text-sm text-slate-500">
+          Checking authentication...
+        </p>
+      </div>
+    </main>
+  );
+}
+
+if (!isAuthenticated) {
+  return null;
+}
   return (
     <main className="min-h-screen bg-slate-950 text-white">
       {/* Background */}
@@ -351,10 +396,8 @@ const jobReadiness =
               icon={<Target className="h-5 w-5" />}
               title="ATS Score"
               value={
-                analysisLoading
-                  ? "..."
-                  : String(resumeAnalysis?.ats_score ?? 0)
-                }
+                analysisLoading ? "..." : String(resumeAnalysis?.ats_score ?? 0)
+              }
               suffix="/100"
               description={
                 resumeAnalysis?.ats_score
@@ -365,11 +408,7 @@ const jobReadiness =
                       : "Needs improvement"
                   : "Upload a resume"
               }
-              trend={
-                resumeAnalysis?.ats_score
-                  ? "AI analyzed"
-                  : "No analysis"
-              }
+              trend={resumeAnalysis?.ats_score ? "AI analyzed" : "No analysis"}
             />
 
             <StatCard
@@ -377,9 +416,7 @@ const jobReadiness =
               title="Resumes"
               value={resumeAnalysis ? "1" : "0"}
               description={
-                resumeAnalysis
-                  ? "Latest resume analyzed"
-                  : "No resume uploaded"
+                resumeAnalysis ? "Latest resume analyzed" : "No resume uploaded"
               }
               trend={resumeAnalysis ? "Active" : "Upload now"}
             />
@@ -419,13 +456,13 @@ const jobReadiness =
                   </div>
 
                   <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-300">
-                     {!resumeAnalysis
-                          ? "No Resume"
-                          : (resumeAnalysis.ats_score ?? 0) >= 80
-                            ? "Excellent"
-                            : (resumeAnalysis.ats_score ?? 0) >= 60
-                              ? "Good"
-                              : "Needs Work"}
+                    {!resumeAnalysis
+                      ? "No Resume"
+                      : (resumeAnalysis.ats_score ?? 0) >= 80
+                        ? "Excellent"
+                        : (resumeAnalysis.ats_score ?? 0) >= 60
+                          ? "Good"
+                          : "Needs Work"}
                   </span>
                 </div>
 
@@ -436,7 +473,7 @@ const jobReadiness =
                       <span className="text-4xl font-bold">
                         {analysisLoading
                           ? "..."
-                          : resumeAnalysis?.ats_score ?? 0}
+                          : (resumeAnalysis?.ats_score ?? 0)}
                       </span>
                       <span className="text-xs text-slate-600">out of 100</span>
                     </div>
@@ -448,7 +485,9 @@ const jobReadiness =
                         Overall performance
                       </span>
 
-                      <span className="font-semibold">{resumeAnalysis?.ats_score ?? 0}%</span>
+                      <span className="font-semibold">
+                        {resumeAnalysis?.ats_score ?? 0}%
+                      </span>
                     </div>
 
                     <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/5">
@@ -489,38 +528,38 @@ const jobReadiness =
               </div>
 
               <div className="mt-7 space-y-4">
-                  <ProgressItem
-                    label="Resume quality"
-                    value={`${resumeAnalysis?.ats_score ?? 0}%`}
-                    width={`${resumeAnalysis?.ats_score ?? 0}%`}
-                  />
+                <ProgressItem
+                  label="Resume quality"
+                  value={`${resumeAnalysis?.ats_score ?? 0}%`}
+                  width={`${resumeAnalysis?.ats_score ?? 0}%`}
+                />
 
-                  <ProgressItem
-                    label="Skills coverage"
-                    value={
-                      resumeAnalysis?.analysis_result?.skills?.length
-                        ? `${Math.min(
-                            resumeAnalysis.analysis_result.skills.length * 10,
-                            100
-                          )}%`
-                        : "0%"
-                    }
-                    width={
-                      resumeAnalysis?.analysis_result?.skills?.length
-                        ? `${Math.min(
-                            resumeAnalysis.analysis_result.skills.length * 10,
-                            100
-                          )}%`
-                        : "0%"
-                    }
-                  />
+                <ProgressItem
+                  label="Skills coverage"
+                  value={
+                    resumeAnalysis?.analysis_result?.skills?.length
+                      ? `${Math.min(
+                          resumeAnalysis.analysis_result.skills.length * 10,
+                          100,
+                        )}%`
+                      : "0%"
+                  }
+                  width={
+                    resumeAnalysis?.analysis_result?.skills?.length
+                      ? `${Math.min(
+                          resumeAnalysis.analysis_result.skills.length * 10,
+                          100,
+                        )}%`
+                      : "0%"
+                  }
+                />
 
-                  <ProgressItem
-                    label="Job compatibility"
-                    value={`${jobReadiness}%`}
-                    width={`${jobReadiness}%`}
-                  />
-                </div>
+                <ProgressItem
+                  label="Job compatibility"
+                  value={`${jobReadiness}%`}
+                  width={`${jobReadiness}%`}
+                />
+              </div>
             </div>
           </section>
 
@@ -600,16 +639,33 @@ const jobReadiness =
               <h3 className="mt-1 text-xl font-bold">Skill Snapshot</h3>
 
               <div className="mt-6 flex flex-wrap gap-2.5">
-                {(
-                  resumeAnalysis?.analysis_result?.skills ?? []
-                ).map((skill) => (
-                  <span
-                    key={skill}
-                    className="rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-sm text-slate-400 transition hover:border-violet-400/30 hover:bg-violet-400/10 hover:text-white"
-                  >
-                    {skill}
-                  </span>
-                ))}
+                {resumeAnalysis?.analysis_result?.skills?.length ? (
+                  resumeAnalysis.analysis_result.skills.map((skill, index) => {
+                    if (typeof skill === "string") {
+                      return (
+                        <span
+                          key={`${skill}-${index}`}
+                          className="rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-sm text-slate-400 transition hover:border-violet-400/30 hover:bg-violet-400/10 hover:text-white"
+                        >
+                          {skill}
+                        </span>
+                      );
+                    }
+
+                    return (
+                      <span
+                        key={`${skill.skill}-${index}`}
+                        className="rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-sm text-slate-400 transition hover:border-violet-400/30 hover:bg-violet-400/10 hover:text-white"
+                      >
+                        {skill.skill}
+                      </span>
+                    );
+                  })
+                ) : (
+                  <p className="text-sm text-slate-600">
+                    Upload a resume to detect your skills.
+                  </p>
+                )}
               </div>
 
               <div className="mt-7 rounded-2xl border border-amber-400/10 bg-amber-400/5 p-4">
@@ -630,7 +686,10 @@ const jobReadiness =
                               key={index}
                               className="text-xs leading-5 text-slate-500"
                             >
-                              • {gap}
+                              •{" "}
+                              {typeof gap === "string"
+                                ? gap
+                                : JSON.stringify(gap)}
                             </p>
                           ))
                       ) : (
@@ -770,7 +829,7 @@ function ProgressItem({
       <div className="h-1.5 overflow-hidden rounded-full bg-white/5">
         <div
           className="h-full rounded-full bg-gradient-to-r from-violet-500 to-blue-500"
-          style={{width}}
+          style={{ width }}
         />
       </div>
     </div>

@@ -17,16 +17,31 @@ import {
   Zap,
 } from "lucide-react";
 
+/* =========================================================
+   TYPES
+========================================================= */
+
+type SkillGap = {
+  skill: string;
+  proficiency: string;
+  years: number;
+};
+
 type AnalysisResult = {
   score?: number;
   summary?: string;
+
+  // Backend is returning strings for skills
   skills?: string[];
+
   missing_skills?: string[];
   strengths?: string[];
   suggestions?: string[];
   recommended_roles?: string[];
   interview_question?: string[];
-  skill_gep?: string[];
+
+  // Backend is returning objects for skill gap
+  skill_gep?: SkillGap[];
 };
 
 type AnalysisResponse = {
@@ -35,6 +50,10 @@ type AnalysisResponse = {
   analysis_result: AnalysisResult | null;
 };
 
+/* =========================================================
+   COMPONENT
+========================================================= */
+
 export default function ResumeAnalysisPage() {
   const searchParams = useSearchParams();
   const resumeId = searchParams.get("resume_id");
@@ -42,6 +61,10 @@ export default function ResumeAnalysisPage() {
   const [analysis, setAnalysis] = useState<AnalysisResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  /* =========================================================
+     FETCH ANALYSIS
+  ========================================================= */
 
   useEffect(() => {
     const fetchAnalysis = async () => {
@@ -71,16 +94,22 @@ export default function ResumeAnalysisPage() {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         const data = await response.json();
 
         if (!response.ok) {
           throw new Error(
-            data.detail || "Failed to fetch resume analysis."
+            data.detail || "Failed to fetch resume analysis.",
           );
         }
+
+        console.log("ANALYSIS RESULT:", data.analysis_result);
+        console.log(
+          "SKILL GAP OBJECT:",
+          data.analysis_result?.skill_gep,
+        );
 
         setAnalysis(data);
       } catch (error) {
@@ -89,7 +118,7 @@ export default function ResumeAnalysisPage() {
         setError(
           error instanceof Error
             ? error.message
-            : "Something went wrong while loading analysis."
+            : "Something went wrong while loading analysis.",
         );
       } finally {
         setLoading(false);
@@ -99,14 +128,13 @@ export default function ResumeAnalysisPage() {
     fetchAnalysis();
   }, [resumeId]);
 
-  /* ---------------------------------------------
-     Loading State
-  --------------------------------------------- */
+  /* =========================================================
+     LOADING STATE
+  ========================================================= */
 
   if (loading) {
     return (
       <main className="relative min-h-screen overflow-hidden bg-slate-950 px-6 py-20 text-white">
-        {/* Background glow */}
         <div className="pointer-events-none absolute left-1/2 top-1/3 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-violet-600/10 blur-[120px]" />
 
         <div className="relative mx-auto flex max-w-3xl flex-col items-center justify-center py-32 text-center">
@@ -123,8 +151,8 @@ export default function ResumeAnalysisPage() {
           </h2>
 
           <p className="mt-3 max-w-md text-sm leading-6 text-gray-500">
-            HireSense AI is reviewing your skills, experience and
-            career profile.
+            HireSense AI is reviewing your skills, experience and career
+            profile.
           </p>
 
           <div className="mt-8 flex items-center gap-2 text-xs text-gray-600">
@@ -136,9 +164,9 @@ export default function ResumeAnalysisPage() {
     );
   }
 
-  /* ---------------------------------------------
-     Error State
-  --------------------------------------------- */
+  /* =========================================================
+     ERROR STATE
+  ========================================================= */
 
   if (error) {
     return (
@@ -155,22 +183,24 @@ export default function ResumeAnalysisPage() {
               Unable to load analysis
             </h2>
 
-            <p className="mt-2 text-sm text-gray-500">
-              {error}
-            </p>
+            <p className="mt-2 text-sm text-gray-500">{error}</p>
           </div>
         </div>
       </main>
     );
   }
 
+  /* =========================================================
+     DATA
+  ========================================================= */
+
   const result = analysis?.analysis_result;
 
   const score = analysis?.ats_score ?? result?.score ?? 0;
 
-  /* ---------------------------------------------
-     Main UI
-  --------------------------------------------- */
+  /* =========================================================
+     MAIN UI
+  ========================================================= */
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-slate-950 px-4 py-10 text-white sm:px-6 lg:px-8">
@@ -181,9 +211,9 @@ export default function ResumeAnalysisPage() {
 
       <div className="relative mx-auto max-w-7xl">
 
-        {/* =========================================
+        {/* =====================================================
             HEADER
-        ========================================= */}
+        ===================================================== */}
 
         <div className="animate-[fadeIn_0.5s_ease-out]">
           <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
@@ -210,13 +240,14 @@ export default function ResumeAnalysisPage() {
           </div>
         </div>
 
-        {/* =========================================
+        {/* =====================================================
             TOP SECTION
-        ========================================= */}
+        ===================================================== */}
 
         <div className="mt-10 grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
 
           {/* ATS SCORE */}
+
           <div className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] p-7 shadow-2xl shadow-black/20 backdrop-blur-xl transition duration-500 hover:-translate-y-1 hover:border-violet-500/20">
             <div className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-violet-600/10 blur-3xl transition duration-500 group-hover:bg-violet-600/20" />
 
@@ -238,16 +269,16 @@ export default function ResumeAnalysisPage() {
               </div>
 
               <div className="mt-8 flex items-center gap-8">
+
                 {/* Score Ring */}
+
                 <div className="relative flex h-36 w-36 shrink-0 items-center justify-center">
                   <div
                     className="absolute inset-0 rounded-full"
                     style={{
                       background: `conic-gradient(rgb(139 92 246) ${
                         score * 3.6
-                      }deg, rgba(255,255,255,0.05) ${
-                        score * 3.6
-                      }deg)`,
+                      }deg, rgba(255,255,255,0.05) ${score * 3.6}deg)`,
                     }}
                   />
 
@@ -289,6 +320,7 @@ export default function ResumeAnalysisPage() {
           </div>
 
           {/* RECOMMENDED ROLES */}
+
           <div className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] p-7 backdrop-blur-xl transition duration-500 hover:-translate-y-1 hover:border-blue-500/20">
             <div className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-blue-600/10 blur-3xl" />
 
@@ -335,9 +367,9 @@ export default function ResumeAnalysisPage() {
           </div>
         </div>
 
-        {/* =========================================
+        {/* =====================================================
             SUMMARY
-        ========================================= */}
+        ===================================================== */}
 
         <section className="mt-6 rounded-3xl border border-white/10 bg-white/[0.04] p-7 backdrop-blur-xl transition duration-500 hover:border-white/15">
           <div className="flex items-center gap-3">
@@ -361,14 +393,16 @@ export default function ResumeAnalysisPage() {
           </p>
         </section>
 
-        {/* =========================================
+        {/* =====================================================
             SKILLS
-        ========================================= */}
+        ===================================================== */}
 
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
 
           {/* Skills */}
+
           <section className="group rounded-3xl border border-white/10 bg-white/[0.04] p-7 backdrop-blur-xl transition duration-500 hover:-translate-y-1 hover:border-emerald-500/20">
+
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10">
                 <Target className="h-5 w-5 text-emerald-400" />
@@ -404,7 +438,9 @@ export default function ResumeAnalysisPage() {
           </section>
 
           {/* Missing Skills */}
+
           <section className="group rounded-3xl border border-white/10 bg-white/[0.04] p-7 backdrop-blur-xl transition duration-500 hover:-translate-y-1 hover:border-orange-500/20">
+
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500/10">
                 <TrendingUp className="h-5 w-5 text-orange-400" />
@@ -440,14 +476,16 @@ export default function ResumeAnalysisPage() {
           </section>
         </div>
 
-        {/* =========================================
+        {/* =====================================================
             STRENGTHS + SUGGESTIONS
-        ========================================= */}
+        ===================================================== */}
 
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
 
           {/* Strengths */}
+
           <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-7 backdrop-blur-xl transition duration-500 hover:border-emerald-500/20">
+
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10">
                 <CheckCircle2 className="h-5 w-5 text-emerald-400" />
@@ -487,7 +525,9 @@ export default function ResumeAnalysisPage() {
           </section>
 
           {/* Suggestions */}
+
           <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-7 backdrop-blur-xl transition duration-500 hover:border-yellow-500/20">
+
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-yellow-500/10">
                 <Lightbulb className="h-5 w-5 text-yellow-400" />
@@ -529,11 +569,12 @@ export default function ResumeAnalysisPage() {
           </section>
         </div>
 
-        {/* =========================================
+        {/* =====================================================
             SKILL GAP
-        ========================================= */}
+        ===================================================== */}
 
         <section className="mt-6 rounded-3xl border border-white/10 bg-white/[0.04] p-7 backdrop-blur-xl transition duration-500 hover:border-cyan-500/20">
+
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/10">
               <Target className="h-5 w-5 text-cyan-400" />
@@ -551,15 +592,40 @@ export default function ResumeAnalysisPage() {
           </div>
 
           <div className="mt-6 grid gap-3 md:grid-cols-2">
+
             {result?.skill_gep?.length ? (
               result.skill_gep.map((gap, index) => (
                 <div
                   key={index}
                   className="rounded-xl border border-cyan-500/10 bg-cyan-500/[0.03] p-4 transition duration-300 hover:border-cyan-500/20 hover:bg-cyan-500/[0.06]"
                 >
-                  <p className="text-sm leading-6 text-gray-400">
-                    {gap}
+
+                  {/* Skill */}
+
+                  <p className="text-sm font-medium text-cyan-300">
+                    {gap.skill}
                   </p>
+
+                  {/* Details */}
+
+                  <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-gray-500">
+
+                    <span>
+                      Proficiency:{" "}
+                      <span className="font-medium text-gray-300">
+                        {gap.proficiency}
+                      </span>
+                    </span>
+
+                    <span>
+                      Experience:{" "}
+                      <span className="font-medium text-gray-300">
+                        {gap.years}{" "}
+                        {gap.years === 1 ? "year" : "years"}
+                      </span>
+                    </span>
+
+                  </div>
                 </div>
               ))
             ) : (
@@ -567,19 +633,24 @@ export default function ResumeAnalysisPage() {
                 No skill gap information available.
               </p>
             )}
+
           </div>
         </section>
 
-        {/* =========================================
+        {/* =====================================================
             INTERVIEW QUESTIONS
-        ========================================= */}
+        ===================================================== */}
 
         <section className="relative mt-6 overflow-hidden rounded-3xl border border-pink-500/10 bg-gradient-to-br from-pink-500/[0.04] via-white/[0.03] to-violet-500/[0.04] p-7 backdrop-blur-xl">
+
           <div className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-pink-600/10 blur-3xl" />
 
           <div className="relative">
+
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+
               <div className="flex items-center gap-3">
+
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-pink-500/10">
                   <MessageSquare className="h-5 w-5 text-pink-400" />
                 </div>
@@ -593,6 +664,7 @@ export default function ResumeAnalysisPage() {
                     Personalized questions based on your resume
                   </p>
                 </div>
+
               </div>
 
               {result?.interview_question?.length ? (
@@ -600,15 +672,18 @@ export default function ResumeAnalysisPage() {
                   {result.interview_question.length} Questions
                 </span>
               ) : null}
+
             </div>
 
             <div className="mt-6 space-y-3">
+
               {result?.interview_question?.length ? (
                 result.interview_question.map((question, index) => (
                   <div
                     key={index}
                     className="group/question flex gap-4 rounded-2xl border border-white/[0.07] bg-black/10 p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-pink-500/20 hover:bg-pink-500/[0.04]"
                   >
+
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-pink-500/10 text-xs font-bold text-pink-400 transition duration-300 group-hover/question:scale-110">
                       {String(index + 1).padStart(2, "0")}
                     </div>
@@ -616,6 +691,7 @@ export default function ResumeAnalysisPage() {
                     <p className="pt-1 text-sm leading-6 text-gray-300">
                       {question}
                     </p>
+
                   </div>
                 ))
               ) : (
@@ -625,18 +701,26 @@ export default function ResumeAnalysisPage() {
                   </p>
                 </div>
               )}
+
             </div>
           </div>
         </section>
 
-        {/* Footer */}
+        {/* =====================================================
+            FOOTER
+        ===================================================== */}
+
         <div className="flex items-center justify-center gap-2 py-10 text-xs text-gray-700">
           <Sparkles className="h-3.5 w-3.5" />
           Powered by HireSense AI
         </div>
+
       </div>
 
-      {/* Custom animation */}
+      {/* =====================================================
+          ANIMATION
+      ===================================================== */}
+
       <style jsx global>{`
         @keyframes fadeIn {
           from {
