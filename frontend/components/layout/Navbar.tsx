@@ -45,7 +45,7 @@ export default function Navbar() {
           </Link>
 
           <Link
-            href="/#about"
+            href="/about"
             className="text-sm text-slate-400 transition hover:text-white"
           >
             About
