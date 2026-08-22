@@ -7,6 +7,7 @@ import {
   Sparkles,
   ArrowUpRight,
 } from "lucide-react";
+import { useGsapScroll } from "@/lib/animations/useGsapScroll";
 
 const matchingSkills = [
   "Python",
@@ -19,17 +20,119 @@ const matchingSkills = [
 const missingSkills = ["AWS", "Kubernetes"];
 
 export default function JobMatching() {
+  const sectionRef = useGsapScroll<HTMLElement>((ctx, { scope, isReduced, gsap }) => {
+    if (isReduced) return;
+
+    // Header reveal
+    gsap.from(".job-matching-header", {
+      scrollTrigger: {
+        trigger: scope,
+        start: "top 82%",
+        toggleActions: "play none none reverse",
+      },
+      opacity: 0,
+      y: 35,
+      duration: 0.8,
+      ease: "power2.out",
+    });
+
+    // Left resume card 3D tilt entrance
+    gsap.from(".job-matching-left-card", {
+      scrollTrigger: {
+        trigger: ".job-matching-grid",
+        start: "top 78%",
+        toggleActions: "play none none reverse",
+      },
+      opacity: 0,
+      x: -35,
+      rotationY: -5,
+      transformPerspective: 1000,
+      duration: 0.9,
+      ease: "power3.out",
+    });
+
+    // Right job description card 3D tilt entrance
+    gsap.from(".job-matching-right-card", {
+      scrollTrigger: {
+        trigger: ".job-matching-grid",
+        start: "top 78%",
+        toggleActions: "play none none reverse",
+      },
+      opacity: 0,
+      x: 35,
+      rotationY: 5,
+      transformPerspective: 1000,
+      duration: 0.9,
+      ease: "power3.out",
+    });
+
+    // Center match indicator pop
+    gsap.from(".job-matching-badge-center", {
+      scrollTrigger: {
+        trigger: ".job-matching-grid",
+        start: "top 78%",
+        toggleActions: "play none none reverse",
+      },
+      opacity: 0,
+      scale: 0.5,
+      duration: 1,
+      ease: "back.out(1.8)",
+      delay: 0.2,
+    });
+
+    // Matching & Missing skills cards
+    gsap.from(".job-matching-results-card", {
+      scrollTrigger: {
+        trigger: ".job-matching-results-grid",
+        start: "top 82%",
+        toggleActions: "play none none reverse",
+      },
+      opacity: 0,
+      y: 35,
+      stagger: 0.15,
+      duration: 0.8,
+      ease: "power2.out",
+    });
+
+    // AI recommendation banner
+    gsap.from(".job-matching-recommendation-box", {
+      scrollTrigger: {
+        trigger: ".job-matching-recommendation-box",
+        start: "top 85%",
+        toggleActions: "play none none reverse",
+      },
+      opacity: 0,
+      y: 30,
+      duration: 0.8,
+      ease: "power2.out",
+    });
+
+    // Background glow scrub
+    gsap.to(".job-matching-bg-glow", {
+      scrollTrigger: {
+        trigger: scope,
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 1.5,
+      },
+      y: -40,
+      scale: 1.1,
+      ease: "none",
+    });
+  });
+
   return (
     <section
+      ref={sectionRef}
       id="job-matching"
       className="relative overflow-hidden bg-[#050713] px-6 py-28"
     >
       {/* Background glow */}
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[500px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-600/10 blur-[160px]" />
+      <div className="job-matching-bg-glow pointer-events-none absolute left-1/2 top-1/2 h-[500px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-600/10 blur-[160px] will-change-transform" />
 
       <div className="relative mx-auto max-w-7xl">
         {/* Header */}
-        <div className="mx-auto max-w-3xl text-center">
+        <div className="job-matching-header mx-auto max-w-3xl text-center">
           <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-blue-500/20 bg-blue-500/10 px-4 py-2 text-sm text-blue-300">
             <BriefcaseBusiness size={15} />
             Intelligent Job Matching
@@ -49,9 +152,9 @@ export default function JobMatching() {
         </div>
 
         {/* Main comparison */}
-        <div className="mt-20 grid gap-6 lg:grid-cols-12">
+        <div className="job-matching-grid mt-20 grid gap-6 lg:grid-cols-12">
           {/* Resume */}
-          <div className="rounded-3xl border border-white/10 bg-white/[0.025] p-6 lg:col-span-5 lg:p-8">
+          <div className="job-matching-left-card rounded-3xl border border-white/10 bg-white/[0.025] p-6 lg:col-span-5 lg:p-8">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-500/10">
                 <BriefcaseBusiness
@@ -112,7 +215,7 @@ export default function JobMatching() {
           <div className="relative flex items-center justify-center lg:col-span-2">
             <div className="absolute hidden h-px w-full bg-gradient-to-r from-violet-500/20 via-blue-500/40 to-violet-500/20 lg:block" />
 
-            <div className="relative flex h-28 w-28 flex-col items-center justify-center rounded-full border border-blue-500/20 bg-[#080a18] shadow-[0_0_50px_rgba(59,130,246,0.12)]">
+            <div className="job-matching-badge-center relative flex h-28 w-28 flex-col items-center justify-center rounded-full border border-blue-500/20 bg-[#080a18] shadow-[0_0_50px_rgba(59,130,246,0.12)]">
               <p className="text-3xl font-bold text-white">92%</p>
               <p className="mt-1 text-[10px] uppercase tracking-widest text-emerald-400">
                 Match
@@ -121,7 +224,7 @@ export default function JobMatching() {
           </div>
 
           {/* Job Description */}
-          <div className="rounded-3xl border border-white/10 bg-white/[0.025] p-6 lg:col-span-5 lg:p-8">
+          <div className="job-matching-right-card rounded-3xl border border-white/10 bg-white/[0.025] p-6 lg:col-span-5 lg:p-8">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-500/10">
                 <BriefcaseBusiness
@@ -175,9 +278,9 @@ export default function JobMatching() {
         </div>
 
         {/* Results */}
-        <div className="mt-8 grid gap-6 md:grid-cols-2">
+        <div className="job-matching-results-grid mt-8 grid gap-6 md:grid-cols-2">
           {/* Matching skills */}
-          <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/[0.025] p-6">
+          <div className="job-matching-results-card rounded-2xl border border-emerald-500/15 bg-emerald-500/[0.025] p-6">
             <div className="flex items-center gap-3">
               <CheckCircle2
                 size={20}
@@ -206,7 +309,7 @@ export default function JobMatching() {
           </div>
 
           {/* Missing skills */}
-          <div className="rounded-2xl border border-amber-500/15 bg-amber-500/[0.025] p-6">
+          <div className="job-matching-results-card rounded-2xl border border-amber-500/15 bg-amber-500/[0.025] p-6">
             <div className="flex items-center gap-3">
               <XCircle size={20} className="text-amber-400" />
 
@@ -233,7 +336,7 @@ export default function JobMatching() {
         </div>
 
         {/* AI recommendation */}
-        <div className="mt-8 rounded-3xl border border-violet-500/15 bg-gradient-to-r from-violet-500/[0.08] to-blue-500/[0.04] p-6 lg:p-8">
+        <div className="job-matching-recommendation-box mt-8 rounded-3xl border border-violet-500/15 bg-gradient-to-r from-violet-500/[0.08] to-blue-500/[0.04] p-6 lg:p-8">
           <div className="flex flex-col gap-5 md:flex-row md:items-center">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-violet-500/10">
               <Sparkles size={21} className="text-violet-400" />

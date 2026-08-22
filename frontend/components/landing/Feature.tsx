@@ -9,6 +9,7 @@ import {
   MessageSquareText,
   ArrowUpRight,
 } from "lucide-react";
+import { useGsapScroll } from "@/lib/animations/useGsapScroll";
 
 const feature = [
   {
@@ -56,17 +57,65 @@ const feature = [
 ];
 
 export default function Features() {
+  const sectionRef = useGsapScroll<HTMLElement>((ctx, { scope, isReduced, gsap }) => {
+    if (isReduced) return;
+
+    // Header reveal
+    gsap.from(".feature-section-header", {
+      scrollTrigger: {
+        trigger: scope,
+        start: "top 80%",
+        toggleActions: "play none none reverse",
+      },
+      opacity: 0,
+      y: 35,
+      duration: 0.8,
+      ease: "power2.out",
+    });
+
+    // Cards 3D staggered reveal
+    gsap.from(".feature-grid-card", {
+      scrollTrigger: {
+        trigger: ".feature-cards-grid",
+        start: "top 78%",
+        toggleActions: "play none none reverse",
+      },
+      opacity: 0,
+      y: 45,
+      scale: 0.95,
+      rotationX: 5,
+      transformPerspective: 1000,
+      stagger: 0.1,
+      duration: 0.8,
+      ease: "power2.out",
+    });
+
+    // Background glow subtle scrub
+    gsap.to(".feature-bg-glow", {
+      scrollTrigger: {
+        trigger: scope,
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 1.5,
+      },
+      y: 60,
+      scale: 1.1,
+      ease: "none",
+    });
+  });
+
   return (
     <section
+      ref={sectionRef}
       id="features"
       className="relative overflow-hidden bg-[#050713] px-6 py-28"
     >
       {/* Background glow */}
-      <div className="pointer-events-none absolute left-1/2 top-0 h-[400px] w-[700px] -translate-x-1/2 rounded-full bg-violet-600/10 blur-[140px]" />
+      <div className="feature-bg-glow pointer-events-none absolute left-1/2 top-0 h-[400px] w-[700px] -translate-x-1/2 rounded-full bg-violet-600/10 blur-[140px] will-change-transform" />
 
       <div className="relative mx-auto max-w-7xl">
         {/* Section Header */}
-        <div className="mx-auto max-w-3xl text-center">
+        <div className="feature-section-header mx-auto max-w-3xl text-center">
           <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-2 text-sm text-violet-300">
             <span className="h-2 w-2 rounded-full bg-violet-400 shadow-[0_0_10px_#8b5cf6]" />
             Powerful AI Features
@@ -87,19 +136,14 @@ export default function Features() {
         </div>
 
         {/* Features Grid */}
-        <div className="mt-16 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {feature.map((feature, index) => {
-            const Icon = feature.icon;
+        <div className="feature-cards-grid mt-16 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {feature.map((feat) => {
+            const Icon = feat.icon;
 
             return (
               <div
-                key={feature.title}
-                className="group relative rounded-2xl border border-white/10 bg-white/[0.025] p-7 transition-all duration-500 hover:-translate-y-2 hover:border-violet-500/30 hover:bg-violet-500/[0.04] hover:shadow-[0_20px_60px_rgba(124,58,237,0.12)]"
-                style={{
-                  animation: `featureFadeUp 0.7s ease-out ${
-                    index * 100
-                  }ms both`,
-                }}
+                key={feat.title}
+                className="feature-grid-card group relative rounded-2xl border border-white/10 bg-white/[0.025] p-7 transition-all duration-500 hover:-translate-y-2 hover:border-violet-500/30 hover:bg-violet-500/[0.04] hover:shadow-[0_20px_60px_rgba(124,58,237,0.12)]"
               >
                 {/* Hover glow */}
                 <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-violet-500/[0.08] via-transparent to-blue-500/[0.05] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
@@ -119,16 +163,16 @@ export default function Features() {
 
                   {/* Tag */}
                   <span className="inline-block rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs font-medium text-slate-400">
-                    {feature.tag}
+                    {feat.tag}
                   </span>
 
                   {/* Content */}
                   <h3 className="mt-5 text-xl font-semibold text-white">
-                    {feature.title}
+                    {feat.title}
                   </h3>
 
                   <p className="mt-3 text-sm leading-7 text-slate-400">
-                    {feature.description}
+                    {feat.description}
                   </p>
 
                   {/* Bottom line */}
@@ -139,20 +183,6 @@ export default function Features() {
           })}
         </div>
       </div>
-
-      {/* Animation */}
-      <style jsx>{`
-        @keyframes featureFadeUp {
-          from {
-            opacity: 0;
-            transform: translateY(25px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </section>
   );
 }

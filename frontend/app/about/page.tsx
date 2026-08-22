@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useEffect } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -9,7 +10,6 @@ import {
   Database,
   FileText,
   Lightbulb,
-  Lock,
   Rocket,
   ShieldCheck,
   Sparkles,
@@ -22,18 +22,211 @@ import {
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/landing/Footer";
 import { useAuth } from "@/context/AuthContext";
+import { useGsapScroll } from "@/lib/animations/useGsapScroll";
+import { init3DTilt } from "@/lib/animations/gsap";
 
 export default function AboutPage() {
   const { isAuthenticated } = useAuth();
+  const heroVisualRef = useRef<HTMLDivElement>(null);
+
+  const mainRef = useGsapScroll<HTMLElement>((ctx, { scope, isReduced, gsap }) => {
+    if (isReduced) return;
+
+    // 1. Hero Left Timeline
+    const heroTl = gsap.timeline({
+      defaults: { ease: "power3.out", duration: 0.85 },
+    });
+
+    heroTl
+      .from(".about-hero-badge", {
+        opacity: 0,
+        y: 20,
+        scale: 0.95,
+        duration: 0.6,
+      })
+      .from(
+        ".about-hero-title",
+        {
+          opacity: 0,
+          y: 35,
+          duration: 0.8,
+        },
+        "-=0.4"
+      )
+      .from(
+        ".about-hero-desc",
+        {
+          opacity: 0,
+          y: 25,
+          duration: 0.7,
+        },
+        "-=0.5"
+      )
+      .from(
+        ".about-hero-cta > *",
+        {
+          opacity: 0,
+          y: 20,
+          stagger: 0.1,
+          duration: 0.6,
+        },
+        "-=0.4"
+      )
+      .from(
+        ".about-hero-check",
+        {
+          opacity: 0,
+          y: 15,
+          stagger: 0.08,
+          duration: 0.5,
+        },
+        "-=0.3"
+      );
+
+    // 2. Hero Visual Card 3D Entrance
+    gsap.from(".about-hero-card", {
+      opacity: 0,
+      scale: 0.92,
+      rotationX: 8,
+      rotationY: -8,
+      transformPerspective: 1200,
+      y: 35,
+      duration: 1.1,
+      ease: "power3.out",
+      delay: 0.2,
+    });
+
+    // 3. What is HireSense Section
+    gsap.from(".about-what-header", {
+      scrollTrigger: {
+        trigger: ".about-what-section",
+        start: "top 82%",
+        toggleActions: "play none none reverse",
+      },
+      opacity: 0,
+      y: 35,
+      duration: 0.8,
+      ease: "power2.out",
+    });
+
+    gsap.from(".about-what-card", {
+      scrollTrigger: {
+        trigger: ".about-what-grid",
+        start: "top 80%",
+        toggleActions: "play none none reverse",
+      },
+      opacity: 0,
+      y: 40,
+      scale: 0.95,
+      rotationX: 4,
+      transformPerspective: 1000,
+      stagger: 0.12,
+      duration: 0.8,
+      ease: "power2.out",
+    });
+
+    // 4. Why HireSense Section
+    gsap.from(".about-why-card", {
+      scrollTrigger: {
+        trigger: ".about-why-grid",
+        start: "top 80%",
+        toggleActions: "play none none reverse",
+      },
+      opacity: 0,
+      y: 35,
+      stagger: 0.1,
+      duration: 0.75,
+      ease: "power2.out",
+    });
+
+    // 5. How It Works Section
+    gsap.from(".about-how-card", {
+      scrollTrigger: {
+        trigger: ".about-how-grid",
+        start: "top 80%",
+        toggleActions: "play none none reverse",
+      },
+      opacity: 0,
+      y: 40,
+      scale: 0.94,
+      rotationY: -5,
+      transformPerspective: 1000,
+      stagger: 0.12,
+      duration: 0.8,
+      ease: "power3.out",
+    });
+
+    // 6. Technology Architecture Section
+    gsap.from(".about-tech-box", {
+      scrollTrigger: {
+        trigger: ".about-tech-box",
+        start: "top 82%",
+        toggleActions: "play none none reverse",
+      },
+      opacity: 0,
+      scale: 0.95,
+      y: 40,
+      duration: 0.9,
+      ease: "power3.out",
+    });
+
+    // 7. Mission & CTA Boxes
+    gsap.from(".about-mission-box", {
+      scrollTrigger: {
+        trigger: ".about-mission-box",
+        start: "top 82%",
+        toggleActions: "play none none reverse",
+      },
+      opacity: 0,
+      scale: 0.95,
+      y: 35,
+      duration: 0.85,
+      ease: "power3.out",
+    });
+
+    gsap.from(".about-cta-box", {
+      scrollTrigger: {
+        trigger: ".about-cta-box",
+        start: "top 82%",
+        toggleActions: "play none none reverse",
+      },
+      opacity: 0,
+      scale: 0.95,
+      y: 35,
+      duration: 0.85,
+      ease: "power3.out",
+    });
+
+    // Background glow parallax
+    gsap.to(".about-bg-glow-1", {
+      scrollTrigger: {
+        trigger: scope,
+        start: "top top",
+        end: "bottom top",
+        scrub: 1.5,
+      },
+      y: -80,
+      ease: "none",
+    });
+  });
+
+  useEffect(() => {
+    const cleanup = init3DTilt(heroVisualRef.current, {
+      maxRotation: 4,
+      perspective: 1000,
+      scale: 1.015,
+    });
+    return cleanup;
+  }, []);
 
   return (
     <>
       <Navbar />
 
-      <main className="min-h-screen overflow-hidden bg-[#030712] text-white">
+      <main ref={mainRef} className="min-h-screen overflow-hidden bg-[#030712] text-white">
         {/* Background Glows */}
         <div className="pointer-events-none fixed inset-0 -z-10">
-          <div className="absolute left-1/2 top-[-220px] h-[500px] w-[700px] -translate-x-1/2 rounded-full bg-violet-600/20 blur-[140px]" />
+          <div className="about-bg-glow-1 absolute left-1/2 top-[-220px] h-[500px] w-[700px] -translate-x-1/2 rounded-full bg-violet-600/20 blur-[140px] will-change-transform" />
           <div className="absolute right-[-150px] top-[500px] h-[400px] w-[400px] rounded-full bg-blue-500/10 blur-[120px]" />
           <div className="absolute left-[-150px] top-[900px] h-[350px] w-[350px] rounded-full bg-purple-600/10 blur-[120px]" />
         </div>
@@ -43,13 +236,13 @@ export default function AboutPage() {
         ====================================================== */}
         <section className="mx-auto grid min-h-[calc(100vh-90px)] w-full max-w-[1500px] items-center gap-14 px-6 pb-20 pt-28 lg:grid-cols-2 lg:px-8">
           {/* Left */}
-          <div className="animate-fade-up">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-2 text-sm text-violet-300">
+          <div>
+            <div className="about-hero-badge mb-6 inline-flex items-center gap-2 rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-2 text-sm text-violet-300">
               <Sparkles className="h-4 w-4" />
               About HireSense AI
             </div>
 
-            <h1 className="max-w-3xl text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
+            <h1 className="about-hero-title max-w-3xl text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
               Your Resume.
               <br />
               Your Skills.
@@ -60,13 +253,13 @@ export default function AboutPage() {
               </span>
             </h1>
 
-            <p className="mt-7 max-w-xl text-lg leading-8 text-gray-400">
+            <p className="about-hero-desc mt-7 max-w-xl text-lg leading-8 text-gray-400">
               HireSense AI is an AI-powered career intelligence platform built
               to help you understand your resume, discover skill gaps, improve
               your ATS performance, and find stronger job opportunities.
             </p>
 
-            <div className="mt-9 flex flex-col gap-4 sm:flex-row">
+            <div className="about-hero-cta mt-9 flex flex-col gap-4 sm:flex-row">
               <Link
                 href={isAuthenticated ? "/dashboard" : "/signup"}
                 className="group flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 px-6 py-3.5 font-semibold shadow-xl shadow-violet-600/20 transition duration-300 hover:-translate-y-1 hover:shadow-violet-600/30"
@@ -84,17 +277,17 @@ export default function AboutPage() {
             </div>
 
             <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm text-gray-500">
-              <div className="flex items-center gap-2">
+              <div className="about-hero-check flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-emerald-400" />
                 AI Resume Analysis
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="about-hero-check flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-emerald-400" />
                 ATS Optimization
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="about-hero-check flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-emerald-400" />
                 Job Matching
               </div>
@@ -102,7 +295,10 @@ export default function AboutPage() {
           </div>
 
           {/* Right - AI Visual */}
-          <div className="relative mx-auto w-full max-w-xl animate-float">
+          <div
+            ref={heroVisualRef}
+            className="about-hero-card relative mx-auto w-full max-w-xl cursor-default"
+          >
             <div className="absolute inset-0 rounded-3xl bg-violet-600/20 blur-[90px]" />
 
             <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.06] p-5 shadow-2xl shadow-black/40 backdrop-blur-xl">
@@ -190,10 +386,10 @@ export default function AboutPage() {
         {/* =====================================================
             WHAT IS HIRE SENSE
         ====================================================== */}
-        <section className="relative mx-auto w-full max-w-[1500px] px-6 py-28 lg:px-8">
+        <section className="about-what-section relative mx-auto w-full max-w-[1500px] px-6 py-28 lg:px-8">
           <div className="pointer-events-none absolute left-1/2 top-20 -z-10 h-72 w-72 -translate-x-1/2 rounded-full bg-violet-600/10 blur-[120px]" />
 
-          <div className="mx-auto max-w-3xl text-center">
+          <div className="about-what-header mx-auto max-w-3xl text-center">
             <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-2 text-sm text-violet-300">
               <Sparkles className="h-4 w-4" />
               What Is HireSense AI?
@@ -215,7 +411,7 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="mt-16 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          <div className="about-what-grid mt-16 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {[
               {
                 icon: FileText,
@@ -244,7 +440,7 @@ export default function AboutPage() {
               return (
                 <div
                   key={item.title}
-                  className={`group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-7 transition-all duration-300 hover:-translate-y-2 hover:bg-white/[0.07] hover:border-${item.color}-500/30`}
+                  className="about-what-card group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-7 transition-all duration-300 hover:-translate-y-2 hover:bg-white/[0.07] hover:border-violet-500/30"
                 >
                   <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-violet-600/10 blur-3xl transition group-hover:bg-violet-600/20" />
 
@@ -288,7 +484,7 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="about-why-grid mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {[
               {
                 icon: Brain,
@@ -316,7 +512,7 @@ export default function AboutPage() {
               return (
                 <div
                   key={item.title}
-                  className="group rounded-2xl border border-white/10 bg-white/[0.04] p-6 transition-all duration-300 hover:-translate-y-2 hover:border-violet-500/30 hover:bg-white/[0.07]"
+                  className="about-why-card group rounded-2xl border border-white/10 bg-white/[0.04] p-6 transition-all duration-300 hover:-translate-y-2 hover:border-violet-500/30 hover:bg-white/[0.07]"
                 >
                   <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400 transition group-hover:scale-110">
                     <Icon className="h-5 w-5" />
@@ -356,7 +552,7 @@ export default function AboutPage() {
             </h2>
           </div>
 
-          <div className="relative mt-20 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+          <div className="about-how-grid relative mt-20 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             {[
               {
                 number: "01",
@@ -386,7 +582,7 @@ export default function AboutPage() {
               const Icon = item.icon;
 
               return (
-                <div key={item.number} className="relative">
+                <div key={item.number} className="about-how-card relative">
                   <div className="group h-full rounded-2xl border border-white/10 bg-white/[0.04] p-7 transition-all duration-300 hover:-translate-y-2 hover:border-violet-500/30 hover:bg-white/[0.07]">
                     <div className="mb-6 flex items-center justify-between">
                       <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400 transition group-hover:scale-110">
@@ -414,7 +610,7 @@ export default function AboutPage() {
             TECHNOLOGY
         ====================================================== */}
         <section className="mx-auto w-full max-w-[1500px] px-6 py-28 lg:px-8">
-          <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-8 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-12 lg:p-16">
+          <div className="about-tech-box rounded-3xl border border-white/10 bg-white/[0.03] p-8 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-12 lg:p-16">
             <div className="grid items-center gap-12 lg:grid-cols-2">
               {/* Text */}
               <div>
@@ -503,7 +699,7 @@ export default function AboutPage() {
             MISSION
         ====================================================== */}
         <section className="mx-auto w-full max-w-[1100px] px-6 py-28 text-center lg:px-8">
-          <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] px-7 py-16 backdrop-blur-xl sm:px-12">
+          <div className="about-mission-box relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] px-7 py-16 backdrop-blur-xl sm:px-12">
             <div className="absolute left-1/2 top-0 h-56 w-96 -translate-x-1/2 rounded-full bg-violet-600/15 blur-[100px]" />
 
             <div className="relative">
@@ -533,7 +729,7 @@ export default function AboutPage() {
             CTA
         ====================================================== */}
         <section className="mx-auto w-full max-w-[1500px] px-6 py-20 lg:px-8">
-          <div className="relative overflow-hidden rounded-3xl border border-violet-500/20 bg-gradient-to-br from-violet-600/10 via-purple-600/5 to-blue-600/10 px-7 py-16 text-center sm:px-12">
+          <div className="about-cta-box relative overflow-hidden rounded-3xl border border-violet-500/20 bg-gradient-to-br from-violet-600/10 via-purple-600/5 to-blue-600/10 px-7 py-16 text-center sm:px-12">
             <div className="absolute left-1/2 top-[-100px] h-72 w-72 -translate-x-1/2 rounded-full bg-violet-600/20 blur-[100px]" />
 
             <div className="relative">

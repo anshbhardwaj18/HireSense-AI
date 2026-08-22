@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import {
   BrainCircuit,
   CheckCircle2,
@@ -8,6 +9,7 @@ import {
   Target,
   AlertCircle,
 } from "lucide-react";
+import { useGsapScroll } from "@/lib/animations/useGsapScroll";
 
 const skills = [
   "Python",
@@ -21,19 +23,150 @@ const skills = [
 const missingSkills = ["AWS", "Redis", "Kubernetes"];
 
 export default function ResumeAnalysis() {
+  const scoreRef = useRef<HTMLParagraphElement>(null);
+
+  const sectionRef = useGsapScroll<HTMLElement>((ctx, { scope, isReduced, gsap }) => {
+    if (isReduced) return;
+
+    // Header reveal
+    gsap.from(".analysis-header", {
+      scrollTrigger: {
+        trigger: scope,
+        start: "top 82%",
+        toggleActions: "play none none reverse",
+      },
+      opacity: 0,
+      y: 35,
+      duration: 0.8,
+      ease: "power2.out",
+    });
+
+    // 3D Dashboard Preview Container Entrance
+    gsap.from(".analysis-dashboard-preview", {
+      scrollTrigger: {
+        trigger: ".analysis-dashboard-preview",
+        start: "top 80%",
+        toggleActions: "play none none reverse",
+      },
+      opacity: 0,
+      scale: 0.94,
+      rotationX: 5,
+      y: 40,
+      transformPerspective: 1200,
+      duration: 1,
+      ease: "power3.out",
+    });
+
+    // ATS Score Count-Up & Dial Entrance
+    const counterObj = { val: 0 };
+    gsap.to(counterObj, {
+      scrollTrigger: {
+        trigger: ".analysis-score-card",
+        start: "top 78%",
+        toggleActions: "play none none reverse",
+      },
+      val: 87,
+      duration: 1.6,
+      ease: "power2.out",
+      onUpdate: () => {
+        if (scoreRef.current) {
+          scoreRef.current.innerText = Math.round(counterObj.val).toString();
+        }
+      },
+    });
+
+    gsap.from(".analysis-score-ring", {
+      scrollTrigger: {
+        trigger: ".analysis-score-card",
+        start: "top 78%",
+        toggleActions: "play none none reverse",
+      },
+      scale: 0.8,
+      rotation: -30,
+      opacity: 0,
+      duration: 1.2,
+      ease: "back.out(1.4)",
+    });
+
+    // Stagger detected skills
+    gsap.from(".analysis-skill-tag", {
+      scrollTrigger: {
+        trigger: ".analysis-skills-card",
+        start: "top 78%",
+        toggleActions: "play none none reverse",
+      },
+      scale: 0.8,
+      opacity: 0,
+      stagger: 0.06,
+      duration: 0.5,
+      ease: "back.out(1.5)",
+    });
+
+    // Stagger missing skills
+    gsap.from(".analysis-missing-skill-item", {
+      scrollTrigger: {
+        trigger: ".analysis-missing-skills-card",
+        start: "top 78%",
+        toggleActions: "play none none reverse",
+      },
+      x: 20,
+      opacity: 0,
+      stagger: 0.1,
+      duration: 0.6,
+      ease: "power2.out",
+    });
+
+    // AI recommendation banner
+    gsap.from(".analysis-recommendation-box", {
+      scrollTrigger: {
+        trigger: ".analysis-recommendation-box",
+        start: "top 85%",
+        toggleActions: "play none none reverse",
+      },
+      y: 25,
+      opacity: 0,
+      duration: 0.8,
+      ease: "power2.out",
+    });
+
+    // Background glow scrub
+    gsap.to(".analysis-bg-glow-1", {
+      scrollTrigger: {
+        trigger: scope,
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 1.5,
+      },
+      y: -60,
+      ease: "none",
+    });
+
+    gsap.to(".analysis-bg-glow-2", {
+      scrollTrigger: {
+        trigger: scope,
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 2,
+      },
+      y: 60,
+      ease: "none",
+    });
+  });
+
   return (
     <section
+      ref={sectionRef}
       id="analysis"
       className="relative overflow-hidden bg-[#050713] px-6 py-28"
     >
       {/* Background glow */}
-      <div className="pointer-events-none absolute left-[-180px] top-1/3 h-[500px] w-[500px] rounded-full bg-violet-600/10 blur-[150px]" />
+      <div className="analysis-bg-glow-1 pointer-events-none absolute left-[-180px] top-1/3 h-[500px] w-[500px] rounded-full bg-violet-600/10 blur-[150px] will-change-transform" />
 
-      <div className="pointer-events-none absolute right-[-180px] bottom-0 h-[500px] w-[500px] rounded-full bg-blue-600/10 blur-[150px]" />
+      <div className="analysis-bg-glow-2 pointer-events-none absolute right-[-180px] bottom-0 h-[500px] w-[500px] rounded-full bg-blue-600/10 blur-[150px] will-change-transform" />
 
       <div className="relative mx-auto max-w-7xl">
         {/* Heading */}
-        <div className="mx-auto max-w-3xl text-center">
+        <div className="analysis-header mx-auto max-w-3xl text-center">
           <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-2 text-sm text-violet-300">
             <Sparkles size={15} />
             AI-Powered Resume Intelligence
@@ -53,7 +186,7 @@ export default function ResumeAnalysis() {
         </div>
 
         {/* Dashboard Preview */}
-        <div className="mt-20 overflow-hidden rounded-3xl border border-white/10 bg-[#080a18] shadow-2xl shadow-violet-950/20">
+        <div className="analysis-dashboard-preview mt-20 overflow-hidden rounded-3xl border border-white/10 bg-[#080a18] shadow-2xl shadow-violet-950/20">
           {/* Top bar */}
           <div className="flex items-center justify-between border-b border-white/10 px-6 py-5">
             <div className="flex items-center gap-3">
@@ -83,7 +216,7 @@ export default function ResumeAnalysis() {
           {/* Dashboard */}
           <div className="grid gap-6 p-6 lg:grid-cols-12 lg:p-8">
             {/* ATS Score */}
-            <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-6 lg:col-span-4">
+            <div className="analysis-score-card rounded-2xl border border-white/10 bg-white/[0.025] p-6 lg:col-span-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-400">ATS Score</p>
@@ -96,11 +229,13 @@ export default function ResumeAnalysis() {
               </div>
 
               <div className="mt-8 flex items-center justify-center">
-                <div className="relative flex h-44 w-44 items-center justify-center rounded-full border-[10px] border-violet-500/15">
+                <div className="analysis-score-ring relative flex h-44 w-44 items-center justify-center rounded-full border-[10px] border-violet-500/15">
                   <div className="absolute inset-0 rounded-full border-[10px] border-transparent border-t-violet-500 border-r-violet-400 rotate-[35deg]" />
 
                   <div className="text-center">
-                    <p className="text-5xl font-bold text-white">87</p>
+                    <p ref={scoreRef} className="text-5xl font-bold text-white">
+                      87
+                    </p>
                     <p className="mt-1 text-xs text-slate-500">
                       out of 100
                     </p>
@@ -115,7 +250,7 @@ export default function ResumeAnalysis() {
             </div>
 
             {/* Skills */}
-            <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-6 lg:col-span-4">
+            <div className="analysis-skills-card rounded-2xl border border-white/10 bg-white/[0.025] p-6 lg:col-span-4">
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-500/10">
                   <CheckCircle2
@@ -138,7 +273,7 @@ export default function ResumeAnalysis() {
                 {skills.map((skill) => (
                   <span
                     key={skill}
-                    className="rounded-lg border border-blue-500/15 bg-blue-500/10 px-3 py-2 text-xs font-medium text-blue-300"
+                    className="analysis-skill-tag rounded-lg border border-blue-500/15 bg-blue-500/10 px-3 py-2 text-xs font-medium text-blue-300"
                   >
                     {skill}
                   </span>
@@ -167,7 +302,7 @@ export default function ResumeAnalysis() {
             </div>
 
             {/* Missing Skills */}
-            <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-6 lg:col-span-4">
+            <div className="analysis-missing-skills-card rounded-2xl border border-white/10 bg-white/[0.025] p-6 lg:col-span-4">
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-500/10">
                   <AlertCircle
@@ -190,7 +325,7 @@ export default function ResumeAnalysis() {
                 {missingSkills.map((skill) => (
                   <div
                     key={skill}
-                    className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3"
+                    className="analysis-missing-skill-item flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3"
                   >
                     <span className="text-sm text-slate-300">
                       {skill}
@@ -205,7 +340,7 @@ export default function ResumeAnalysis() {
             </div>
 
             {/* AI Recommendation */}
-            <div className="rounded-2xl border border-violet-500/15 bg-gradient-to-br from-violet-500/[0.08] to-blue-500/[0.04] p-6 lg:col-span-12">
+            <div className="analysis-recommendation-box rounded-2xl border border-violet-500/15 bg-gradient-to-br from-violet-500/[0.08] to-blue-500/[0.04] p-6 lg:col-span-12">
               <div className="flex flex-col gap-5 md:flex-row md:items-start">
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-violet-500/10">
                   <Sparkles

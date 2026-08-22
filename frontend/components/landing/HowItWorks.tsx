@@ -7,6 +7,7 @@ import {
   ArrowRight,
   CheckCircle2,
 } from "lucide-react";
+import { useGsapScroll } from "@/lib/animations/useGsapScroll";
 
 const steps = [
   {
@@ -36,17 +37,78 @@ const steps = [
 ];
 
 export default function HowItWorks() {
+  const sectionRef = useGsapScroll<HTMLElement>((ctx, { scope, isReduced, gsap }) => {
+    if (isReduced) return;
+
+    // Header reveal
+    gsap.from(".how-header", {
+      scrollTrigger: {
+        trigger: scope,
+        start: "top 82%",
+        toggleActions: "play none none reverse",
+      },
+      opacity: 0,
+      y: 35,
+      duration: 0.8,
+      ease: "power2.out",
+    });
+
+    // Connecting line draw animation
+    gsap.from(".how-connecting-line", {
+      scrollTrigger: {
+        trigger: ".how-steps-grid",
+        start: "top 78%",
+        toggleActions: "play none none reverse",
+      },
+      scaleX: 0,
+      transformOrigin: "left center",
+      duration: 1,
+      ease: "power2.inOut",
+    });
+
+    // Steps 3D staggered entrance
+    gsap.from(".how-step-col", {
+      scrollTrigger: {
+        trigger: ".how-steps-grid",
+        start: "top 76%",
+        toggleActions: "play none none reverse",
+      },
+      opacity: 0,
+      y: 40,
+      scale: 0.94,
+      rotationY: -6,
+      transformPerspective: 1000,
+      stagger: 0.16,
+      duration: 0.85,
+      ease: "power3.out",
+    });
+
+    // Background glow scrub
+    gsap.to(".how-bg-glow", {
+      scrollTrigger: {
+        trigger: scope,
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 1.5,
+      },
+      y: -50,
+      scale: 1.1,
+      ease: "none",
+    });
+  });
+
   return (
     <section
+      ref={sectionRef}
       id="how-it-works"
       className="relative overflow-hidden bg-[#050713] px-6 py-28"
     >
       {/* Background glow */}
-      <div className="pointer-events-none absolute right-0 top-1/3 h-[450px] w-[450px] rounded-full bg-blue-600/10 blur-[140px]" />
+      <div className="how-bg-glow pointer-events-none absolute right-0 top-1/3 h-[450px] w-[450px] rounded-full bg-blue-600/10 blur-[140px] will-change-transform" />
 
       <div className="relative mx-auto max-w-7xl">
         {/* Header */}
-        <div className="mx-auto max-w-3xl text-center">
+        <div className="how-header mx-auto max-w-3xl text-center">
           <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-blue-500/20 bg-blue-500/10 px-4 py-2 text-sm text-blue-300">
             <span className="h-2 w-2 rounded-full bg-blue-400 shadow-[0_0_10px_#60a5fa]" />
             Simple & Intelligent
@@ -67,9 +129,9 @@ export default function HowItWorks() {
         </div>
 
         {/* Steps */}
-        <div className="relative mt-20 grid gap-8 lg:grid-cols-3">
+        <div className="how-steps-grid relative mt-20 grid gap-8 lg:grid-cols-3">
           {/* Connecting line */}
-          <div className="pointer-events-none absolute left-[16%] right-[16%] top-[68px] hidden h-px bg-gradient-to-r from-violet-500/20 via-violet-500/50 to-blue-500/20 lg:block" />
+          <div className="how-connecting-line pointer-events-none absolute left-[16%] right-[16%] top-[68px] hidden h-px bg-gradient-to-r from-violet-500/20 via-violet-500/50 to-blue-500/20 lg:block will-change-transform" />
 
           {steps.map((step, index) => {
             const Icon = step.icon;
@@ -77,12 +139,7 @@ export default function HowItWorks() {
             return (
               <div
                 key={step.number}
-                className="group relative"
-                style={{
-                  animation: `howItWorksFade 0.7s ease-out ${
-                    index * 150
-                  }ms both`,
-                }}
+                className="how-step-col group relative"
               >
                 {/* Number / Icon */}
                 <div className="relative z-10 mx-auto flex h-[136px] w-[136px] items-center justify-center rounded-full border border-white/10 bg-[#080a18] shadow-[0_0_40px_rgba(124,58,237,0.08)] transition-all duration-500 group-hover:border-violet-500/40 group-hover:shadow-[0_0_50px_rgba(124,58,237,0.2)]">
@@ -140,20 +197,6 @@ export default function HowItWorks() {
           })}
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes howItWorksFade {
-          from {
-            opacity: 0;
-            transform: translateY(25px);
-          }
-
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </section>
   );
 }

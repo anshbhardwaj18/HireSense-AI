@@ -22,6 +22,7 @@ import {
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useGsapScroll } from "@/lib/animations/useGsapScroll";
 
 type Skill = {
   skill: string;
@@ -57,6 +58,37 @@ function DashboardContent() {
   const router = useRouter();
 
   const userName = user?.full_name || "User";
+
+  // GSAP Dashboard Animations
+  const contentRef = useGsapScroll<HTMLDivElement>((ctx, { isReduced, gsap }) => {
+    if (isReduced) return;
+
+    gsap.from(".dash-header-section", {
+      opacity: 0,
+      y: 25,
+      duration: 0.7,
+      ease: "power2.out",
+    });
+
+    gsap.from(".dash-stat-item", {
+      opacity: 0,
+      y: 30,
+      scale: 0.96,
+      stagger: 0.08,
+      duration: 0.65,
+      ease: "power2.out",
+      delay: 0.1,
+    });
+
+    gsap.from(".dash-card-section", {
+      opacity: 0,
+      y: 35,
+      stagger: 0.12,
+      duration: 0.75,
+      ease: "power2.out",
+      delay: 0.2,
+    });
+  });
 
   useEffect(() => {
     const fetchResumeAnalysis = async () => {
@@ -103,7 +135,6 @@ function DashboardContent() {
     router.push("/");
   };
 
-  const skillsCount = resumeAnalysis?.analysis_result?.skills?.length ?? 0;
   const missingSkillsCount = resumeAnalysis?.analysis_result?.missing_skills?.length ?? 0;
 
   const jobReadiness =
@@ -113,6 +144,7 @@ function DashboardContent() {
           Math.min(100, resumeAnalysis.ats_score - missingSkillsCount * 2),
         )
       : 0;
+
   return (
     <main className="min-h-screen bg-slate-950 text-white">
       {/* Background */}
@@ -313,9 +345,9 @@ function DashboardContent() {
         </header>
 
         {/* ================= CONTENT ================= */}
-        <div className="mx-auto max-w-[1450px] px-5 pb-20 pt-10 sm:px-7 lg:px-10 lg:pt-12">
+        <div ref={contentRef} className="mx-auto max-w-[1450px] px-5 pb-20 pt-10 sm:px-7 lg:px-10 lg:pt-12">
           {/* Greeting */}
-          <section className="mb-9">
+          <section className="dash-header-section mb-9">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-violet-400/20 bg-violet-400/10 px-3 py-1.5 text-xs font-medium text-violet-300">
               <Sparkles className="h-3.5 w-3.5" />
               AI Career Intelligence
@@ -326,7 +358,7 @@ function DashboardContent() {
             </h2>
 
             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500 sm:text-base">
-              Here's your career overview. Track your resume performance,
+              Here&apos;s your career overview. Track your resume performance,
               discover skill gaps and improve your job readiness.
             </p>
             <ResumeUpload />
@@ -334,55 +366,63 @@ function DashboardContent() {
 
           {/* ================= STATS ================= */}
           <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <StatCard
-              icon={<Target className="h-5 w-5" />}
-              title="ATS Score"
-              value={
-                analysisLoading ? "..." : String(resumeAnalysis?.ats_score ?? 0)
-              }
-              suffix="/100"
-              description={
-                resumeAnalysis?.ats_score
-                  ? resumeAnalysis.ats_score >= 80
-                    ? "Excellent resume"
-                    : resumeAnalysis.ats_score >= 60
-                      ? "Good resume"
-                      : "Needs improvement"
-                  : "Upload a resume"
-              }
-              trend={resumeAnalysis?.ats_score ? "AI analyzed" : "No analysis"}
-            />
+            <div className="dash-stat-item">
+              <StatCard
+                icon={<Target className="h-5 w-5" />}
+                title="ATS Score"
+                value={
+                  analysisLoading ? "..." : String(resumeAnalysis?.ats_score ?? 0)
+                }
+                suffix="/100"
+                description={
+                  resumeAnalysis?.ats_score
+                    ? resumeAnalysis.ats_score >= 80
+                      ? "Excellent resume"
+                      : resumeAnalysis.ats_score >= 60
+                        ? "Good resume"
+                        : "Needs improvement"
+                    : "Upload a resume"
+                }
+                trend={resumeAnalysis?.ats_score ? "AI analyzed" : "No analysis"}
+              />
+            </div>
 
-            <StatCard
-              icon={<FileText className="h-5 w-5" />}
-              title="Resumes"
-              value={resumeAnalysis ? "1" : "0"}
-              description={
-                resumeAnalysis ? "Latest resume analyzed" : "No resume uploaded"
-              }
-              trend={resumeAnalysis ? "Active" : "Upload now"}
-            />
+            <div className="dash-stat-item">
+              <StatCard
+                icon={<FileText className="h-5 w-5" />}
+                title="Resumes"
+                value={resumeAnalysis ? "1" : "0"}
+                description={
+                  resumeAnalysis ? "Latest resume analyzed" : "No resume uploaded"
+                }
+                trend={resumeAnalysis ? "Active" : "Upload now"}
+              />
+            </div>
 
-            <StatCard
-              icon={<BriefcaseBusiness className="h-5 w-5" />}
-              title="Job Match"
-              value="-"
-              description="Analyze a job description"
-              trend="Not Analyzed"
-            />
+            <div className="dash-stat-item">
+              <StatCard
+                icon={<BriefcaseBusiness className="h-5 w-5" />}
+                title="Job Match"
+                value="-"
+                description="Analyze a job description"
+                trend="Not Analyzed"
+              />
+            </div>
 
-            <StatCard
-              icon={<TrendingUp className="h-5 w-5" />}
-              title="Job Readiness"
-              value={String(jobReadiness)}
-              suffix="%"
-              description="Career progress"
-              trend="+6%"
-            />
+            <div className="dash-stat-item">
+              <StatCard
+                icon={<TrendingUp className="h-5 w-5" />}
+                title="Job Readiness"
+                value={String(jobReadiness)}
+                suffix="%"
+                description="Career progress"
+                trend="+6%"
+              />
+            </div>
           </section>
 
           {/* ================= ATS + READINESS ================= */}
-          <section className="mt-6 grid gap-6 xl:grid-cols-[1.45fr_1fr]">
+          <section className="dash-card-section mt-6 grid gap-6 xl:grid-cols-[1.45fr_1fr]">
             {/* ATS */}
             <div className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035] p-6 backdrop-blur-xl sm:p-7">
               <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-violet-500/10 blur-3xl transition group-hover:bg-violet-500/20" />
@@ -506,7 +546,7 @@ function DashboardContent() {
           </section>
 
           {/* ================= QUICK ACTIONS ================= */}
-          <section className="mt-10">
+          <section className="dash-card-section mt-10">
             <div className="mb-5">
               <p className="text-sm text-slate-600">Take action</p>
               <h3 className="mt-1 text-2xl font-bold">Quick Actions</h3>
@@ -536,7 +576,7 @@ function DashboardContent() {
           </section>
 
           {/* ================= ACTIVITY + SKILLS ================= */}
-          <section className="mt-10 grid gap-6 lg:grid-cols-2">
+          <section className="dash-card-section mt-10 grid gap-6 lg:grid-cols-2">
             {/* Activity */}
             <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-6 backdrop-blur-xl">
               <div className="flex items-center justify-between">
