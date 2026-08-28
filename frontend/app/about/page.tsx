@@ -38,164 +38,225 @@ export default function AboutPage() {
     });
 
     heroTl
-      .from(".about-hero-badge", {
-        opacity: 0,
-        y: 20,
-        scale: 0.95,
-        duration: 0.6,
-      })
-      .from(
+      .fromTo(
+        ".about-hero-badge",
+        { opacity: 0, y: 20, scale: 0.95 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.6 }
+      )
+      .fromTo(
         ".about-hero-title",
-        {
-          opacity: 0,
-          y: 35,
-          duration: 0.8,
-        },
+        { opacity: 0, y: 35 },
+        { opacity: 1, y: 0, duration: 0.8 },
         "-=0.4"
       )
-      .from(
+      .fromTo(
         ".about-hero-desc",
-        {
-          opacity: 0,
-          y: 25,
-          duration: 0.7,
-        },
+        { opacity: 0, y: 25 },
+        { opacity: 1, y: 0, duration: 0.7 },
         "-=0.5"
       )
-      .from(
+      .fromTo(
         ".about-hero-cta > *",
-        {
-          opacity: 0,
-          y: 20,
-          stagger: 0.1,
-          duration: 0.6,
-        },
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, stagger: 0.1, duration: 0.6 },
         "-=0.4"
       )
-      .from(
+      .fromTo(
         ".about-hero-check",
-        {
-          opacity: 0,
-          y: 15,
-          stagger: 0.08,
-          duration: 0.5,
-        },
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, stagger: 0.08, duration: 0.5 },
         "-=0.3"
       );
 
     // 2. Hero Visual Card 3D Entrance
-    gsap.from(".about-hero-card", {
-      opacity: 0,
-      scale: 0.92,
-      rotationX: 8,
-      rotationY: -8,
-      transformPerspective: 1200,
-      y: 35,
-      duration: 1.1,
-      ease: "power3.out",
-      delay: 0.2,
-    });
-
-    // 3. What is HireSense Section
-    gsap.from(".about-what-header", {
-      scrollTrigger: {
-        trigger: ".about-what-section",
-        start: "top 82%",
-        toggleActions: "play none none reverse",
+    gsap.fromTo(
+      ".about-hero-card",
+      {
+        opacity: 0,
+        scale: 0.92,
+        rotationX: 6,
+        rotationY: -6,
+        transformPerspective: 1200,
+        y: 35,
       },
-      opacity: 0,
-      y: 35,
-      duration: 0.8,
-      ease: "power2.out",
-    });
+      {
+        opacity: 1,
+        scale: 1,
+        rotationX: 0,
+        rotationY: 0,
+        transformPerspective: 1200,
+        y: 0,
+        duration: 1.1,
+        ease: "power3.out",
+        delay: 0.2,
+      }
+    );
 
-    gsap.from(".about-what-card", {
-      scrollTrigger: {
-        trigger: ".about-what-grid",
-        start: "top 80%",
-        toggleActions: "play none none reverse",
-      },
-      opacity: 0,
-      y: 40,
-      scale: 0.95,
-      rotationX: 4,
-      transformPerspective: 1000,
-      stagger: 0.12,
-      duration: 0.8,
-      ease: "power2.out",
-    });
+    // 3. What is HireSense Section (Two-Way)
+    gsap.fromTo(
+      ".about-what-header",
+      { opacity: 0, y: 30, scale: 0.98 },
+      {
+        scrollTrigger: {
+          trigger: ".about-what-section",
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.7,
+        ease: "power2.out",
+      }
+    );
 
-    // 4. Why HireSense Section
-    gsap.from(".about-why-card", {
-      scrollTrigger: {
-        trigger: ".about-why-grid",
-        start: "top 80%",
-        toggleActions: "play none none reverse",
+    gsap.fromTo(
+      ".about-what-card",
+      {
+        opacity: 0,
+        y: 35,
+        scale: 0.97,
+        rotationX: 4,
+        transformPerspective: 1000,
       },
-      opacity: 0,
-      y: 35,
-      stagger: 0.1,
-      duration: 0.75,
-      ease: "power2.out",
-    });
+      {
+        scrollTrigger: {
+          trigger: ".about-what-grid",
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        rotationX: 0,
+        transformPerspective: 1000,
+        stagger: 0.1,
+        duration: 0.65,
+        ease: "power2.out",
+      }
+    );
 
-    // 5. How It Works Section
-    gsap.from(".about-how-card", {
-      scrollTrigger: {
-        trigger: ".about-how-grid",
-        start: "top 80%",
-        toggleActions: "play none none reverse",
+    // 4. Why HireSense Section (Two-Way)
+    gsap.fromTo(
+      ".about-why-card",
+      {
+        opacity: 0,
+        y: 30,
+        scale: 0.98,
       },
-      opacity: 0,
-      y: 40,
-      scale: 0.94,
-      rotationY: -5,
-      transformPerspective: 1000,
-      stagger: 0.12,
-      duration: 0.8,
-      ease: "power3.out",
-    });
+      {
+        scrollTrigger: {
+          trigger: ".about-why-grid",
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        stagger: 0.08,
+        duration: 0.65,
+        ease: "power2.out",
+      }
+    );
 
-    // 6. Technology Architecture Section
-    gsap.from(".about-tech-box", {
-      scrollTrigger: {
-        trigger: ".about-tech-box",
-        start: "top 82%",
-        toggleActions: "play none none reverse",
+    // 5. How It Works Section (Two-Way)
+    gsap.fromTo(
+      ".about-how-card",
+      {
+        opacity: 0,
+        y: 35,
+        scale: 0.96,
+        rotationY: -4,
+        transformPerspective: 1000,
       },
-      opacity: 0,
-      scale: 0.95,
-      y: 40,
-      duration: 0.9,
-      ease: "power3.out",
-    });
+      {
+        scrollTrigger: {
+          trigger: ".about-how-grid",
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        rotationY: 0,
+        transformPerspective: 1000,
+        stagger: 0.1,
+        duration: 0.65,
+        ease: "power3.out",
+      }
+    );
 
-    // 7. Mission & CTA Boxes
-    gsap.from(".about-mission-box", {
-      scrollTrigger: {
-        trigger: ".about-mission-box",
-        start: "top 82%",
-        toggleActions: "play none none reverse",
+    // 6. Technology Architecture Section (Two-Way)
+    gsap.fromTo(
+      ".about-tech-box",
+      {
+        opacity: 0,
+        scale: 0.96,
+        y: 35,
       },
-      opacity: 0,
-      scale: 0.95,
-      y: 35,
-      duration: 0.85,
-      ease: "power3.out",
-    });
+      {
+        scrollTrigger: {
+          trigger: ".about-tech-box",
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        opacity: 1,
+        scale: 1,
+        y: 0,
+        duration: 0.8,
+        ease: "power3.out",
+      }
+    );
 
-    gsap.from(".about-cta-box", {
-      scrollTrigger: {
-        trigger: ".about-cta-box",
-        start: "top 82%",
-        toggleActions: "play none none reverse",
+    // 7. Mission & CTA Boxes (Two-Way)
+    gsap.fromTo(
+      ".about-mission-box",
+      {
+        opacity: 0,
+        scale: 0.96,
+        y: 30,
       },
-      opacity: 0,
-      scale: 0.95,
-      y: 35,
-      duration: 0.85,
-      ease: "power3.out",
-    });
+      {
+        scrollTrigger: {
+          trigger: ".about-mission-box",
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        opacity: 1,
+        scale: 1,
+        y: 0,
+        duration: 0.75,
+        ease: "power3.out",
+      }
+    );
+
+    gsap.fromTo(
+      ".about-cta-box",
+      {
+        opacity: 0,
+        scale: 0.96,
+        y: 30,
+      },
+      {
+        scrollTrigger: {
+          trigger: ".about-cta-box",
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        opacity: 1,
+        scale: 1,
+        y: 0,
+        duration: 0.75,
+        ease: "power3.out",
+      }
+    );
 
     // Background glow parallax
     gsap.to(".about-bg-glow-1", {
@@ -440,7 +501,7 @@ export default function AboutPage() {
               return (
                 <div
                   key={item.title}
-                  className="about-what-card group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-7 transition-all duration-300 hover:-translate-y-2 hover:bg-white/[0.07] hover:border-violet-500/30"
+                  className="about-what-card group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-7 transition-[border-color,background-color,box-shadow] duration-300 hover:bg-white/[0.07] hover:border-violet-500/30"
                 >
                   <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-violet-600/10 blur-3xl transition group-hover:bg-violet-600/20" />
 
@@ -512,7 +573,7 @@ export default function AboutPage() {
               return (
                 <div
                   key={item.title}
-                  className="about-why-card group rounded-2xl border border-white/10 bg-white/[0.04] p-6 transition-all duration-300 hover:-translate-y-2 hover:border-violet-500/30 hover:bg-white/[0.07]"
+                  className="about-why-card group rounded-2xl border border-white/10 bg-white/[0.04] p-6 transition-[border-color,background-color,box-shadow] duration-300 hover:border-violet-500/30 hover:bg-white/[0.07]"
                 >
                   <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400 transition group-hover:scale-110">
                     <Icon className="h-5 w-5" />
@@ -583,7 +644,7 @@ export default function AboutPage() {
 
               return (
                 <div key={item.number} className="about-how-card relative">
-                  <div className="group h-full rounded-2xl border border-white/10 bg-white/[0.04] p-7 transition-all duration-300 hover:-translate-y-2 hover:border-violet-500/30 hover:bg-white/[0.07]">
+                  <div className="group h-full rounded-2xl border border-white/10 bg-white/[0.04] p-7 transition-[border-color,background-color,box-shadow] duration-300 hover:border-violet-500/30 hover:bg-white/[0.07]">
                     <div className="mb-6 flex items-center justify-between">
                       <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400 transition group-hover:scale-110">
                         <Icon className="h-6 w-6" />

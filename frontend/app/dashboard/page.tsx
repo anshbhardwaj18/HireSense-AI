@@ -63,31 +63,38 @@ function DashboardContent() {
   const contentRef = useGsapScroll<HTMLDivElement>((ctx, { isReduced, gsap }) => {
     if (isReduced) return;
 
-    gsap.from(".dash-header-section", {
-      opacity: 0,
-      y: 25,
-      duration: 0.7,
-      ease: "power2.out",
-    });
+    gsap.fromTo(
+      ".dash-header-section",
+      { opacity: 0, y: 25 },
+      { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" }
+    );
 
-    gsap.from(".dash-stat-item", {
-      opacity: 0,
-      y: 30,
-      scale: 0.96,
-      stagger: 0.08,
-      duration: 0.65,
-      ease: "power2.out",
-      delay: 0.1,
-    });
+    gsap.fromTo(
+      ".dash-stat-item",
+      { opacity: 0, y: 25, scale: 0.97 },
+      {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        stagger: 0.07,
+        duration: 0.6,
+        ease: "power2.out",
+        delay: 0.1,
+      }
+    );
 
-    gsap.from(".dash-card-section", {
-      opacity: 0,
-      y: 35,
-      stagger: 0.12,
-      duration: 0.75,
-      ease: "power2.out",
-      delay: 0.2,
-    });
+    gsap.fromTo(
+      ".dash-card-section",
+      { opacity: 0, y: 30 },
+      {
+        opacity: 1,
+        y: 0,
+        stagger: 0.1,
+        duration: 0.7,
+        ease: "power2.out",
+        delay: 0.15,
+      }
+    );
   });
 
   useEffect(() => {

@@ -83,6 +83,27 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* ── HireSense App-Specific Theme Tokens (Light Mode) ── */
+  --hs-bg: #f0f2f8;
+  --hs-bg-auth: #f3f4fb;
+  --hs-surface: rgba(255, 255, 255, 0.92);
+  --hs-surface-2: rgba(255, 255, 255, 0.7);
+  --hs-surface-footer: #e8eaf3;
+  --hs-surface-section: #eef0f8;
+  --hs-border: rgba(0, 0, 0, 0.09);
+  --hs-border-subtle: rgba(0, 0, 0, 0.06);
+  --hs-text-primary: #0f172a;
+  --hs-text-muted: #475569;
+  --hs-text-dimmed: #94a3b8;
+  --hs-card-shadow: 0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.04);
+  --hs-navbar-bg: rgba(248, 250, 252, 0.88);
+  --hs-sidebar-bg: rgba(248, 250, 252, 0.97);
+  --hs-dash-bg: #f0f2f8;
+  --hs-input-bg: rgba(255, 255, 255, 0.9);
+  --hs-input-text: #0f172a;
+  --hs-input-placeholder: #94a3b8;
+  --hs-score-ring-inner: #f8f9fc;
 }
 
 .dark {
@@ -117,6 +138,27 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+
+  /* ── HireSense App-Specific Theme Tokens (Dark Mode) ── */
+  --hs-bg: #030712;
+  --hs-bg-auth: #05050a;
+  --hs-surface: rgba(255, 255, 255, 0.025);
+  --hs-surface-2: rgba(255, 255, 255, 0.035);
+  --hs-surface-footer: #03040b;
+  --hs-surface-section: #050713;
+  --hs-border: rgba(255, 255, 255, 0.10);
+  --hs-border-subtle: rgba(255, 255, 255, 0.06);
+  --hs-text-primary: #ffffff;
+  --hs-text-muted: #94a3b8;
+  --hs-text-dimmed: #475569;
+  --hs-card-shadow: none;
+  --hs-navbar-bg: rgba(2, 6, 23, 0.75);
+  --hs-sidebar-bg: rgba(2, 6, 23, 0.95);
+  --hs-dash-bg: #020817;
+  --hs-input-bg: rgba(0, 0, 0, 0.20);
+  --hs-input-text: #ffffff;
+  --hs-input-placeholder: #4b5563;
+  --hs-score-ring-inner: #020817;
 }
 @keyframes fade-up {
   from {
@@ -185,8 +227,36 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-color: var(--hs-bg);
+    color: var(--hs-text-primary);
+    transition: background-color 0.25s ease, color 0.2s ease;
   }
   html {
     @apply font-sans;
+    color-scheme: dark;
   }
+  html:not(.dark) {
+    color-scheme: light;
+  }
+}
+
+/* Smooth theme transitions — only for non-GSAP properties */
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, box-shadow, color;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
+}
+
+/* Exceptions: elements that GSAP controls should not have CSS transitions on transform/opacity */
+.feature-grid-card,
+.how-step-col,
+.cta-box-container,
+.feature-section-header,
+.how-header,
+.hero-card-container,
+.about-hero-card {
+  transition-property: border-color, background-color, box-shadow !important;
+  transition-duration: 0.2s !important;
 }

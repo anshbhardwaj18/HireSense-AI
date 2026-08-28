@@ -40,48 +40,71 @@ export default function HowItWorks() {
   const sectionRef = useGsapScroll<HTMLElement>((ctx, { scope, isReduced, gsap }) => {
     if (isReduced) return;
 
-    // Header reveal
-    gsap.from(".how-header", {
-      scrollTrigger: {
-        trigger: scope,
-        start: "top 82%",
-        toggleActions: "play none none reverse",
-      },
-      opacity: 0,
-      y: 35,
-      duration: 0.8,
-      ease: "power2.out",
-    });
+    // Header reveal (Two-Way)
+    gsap.fromTo(
+      ".how-header",
+      { opacity: 0, y: 30, scale: 0.98 },
+      {
+        scrollTrigger: {
+          trigger: scope,
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.7,
+        ease: "power2.out",
+      }
+    );
 
-    // Connecting line draw animation
-    gsap.from(".how-connecting-line", {
-      scrollTrigger: {
-        trigger: ".how-steps-grid",
-        start: "top 78%",
-        toggleActions: "play none none reverse",
-      },
-      scaleX: 0,
-      transformOrigin: "left center",
-      duration: 1,
-      ease: "power2.inOut",
-    });
+    // Connecting line draw animation (Two-Way)
+    gsap.fromTo(
+      ".how-connecting-line",
+      { scaleX: 0, opacity: 0 },
+      {
+        scrollTrigger: {
+          trigger: ".how-steps-grid",
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        scaleX: 1,
+        opacity: 1,
+        transformOrigin: "left center",
+        duration: 0.8,
+        ease: "power2.inOut",
+      }
+    );
 
-    // Steps 3D staggered entrance
-    gsap.from(".how-step-col", {
-      scrollTrigger: {
-        trigger: ".how-steps-grid",
-        start: "top 76%",
-        toggleActions: "play none none reverse",
+    // Steps 3D staggered entrance (Two-Way)
+    gsap.fromTo(
+      ".how-step-col",
+      {
+        opacity: 0,
+        y: 35,
+        scale: 0.96,
+        rotationY: -4,
+        transformPerspective: 1000,
       },
-      opacity: 0,
-      y: 40,
-      scale: 0.94,
-      rotationY: -6,
-      transformPerspective: 1000,
-      stagger: 0.16,
-      duration: 0.85,
-      ease: "power3.out",
-    });
+      {
+        scrollTrigger: {
+          trigger: ".how-steps-grid",
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        rotationY: 0,
+        transformPerspective: 1000,
+        stagger: 0.12,
+        duration: 0.65,
+        ease: "power2.out",
+      }
+    );
 
     // Background glow scrub
     gsap.to(".how-bg-glow", {
@@ -142,7 +165,7 @@ export default function HowItWorks() {
                 className="how-step-col group relative"
               >
                 {/* Number / Icon */}
-                <div className="relative z-10 mx-auto flex h-[136px] w-[136px] items-center justify-center rounded-full border border-white/10 bg-[#080a18] shadow-[0_0_40px_rgba(124,58,237,0.08)] transition-all duration-500 group-hover:border-violet-500/40 group-hover:shadow-[0_0_50px_rgba(124,58,237,0.2)]">
+                <div className="relative z-10 mx-auto flex h-[136px] w-[136px] items-center justify-center rounded-full border border-white/10 bg-[#080a18] shadow-[0_0_40px_rgba(124,58,237,0.08)] transition-[border-color,box-shadow] duration-500 group-hover:border-violet-500/40 group-hover:shadow-[0_0_50px_rgba(124,58,237,0.2)]">
                   <div className="flex h-[88px] w-[88px] flex-col items-center justify-center rounded-full border border-violet-500/20 bg-violet-500/10 transition-all duration-500 group-hover:scale-110 group-hover:bg-violet-500/20">
                     <Icon
                       size={27}
@@ -157,7 +180,7 @@ export default function HowItWorks() {
                 </div>
 
                 {/* Card */}
-                <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.025] p-7 text-center transition-all duration-500 group-hover:-translate-y-1 group-hover:border-violet-500/25 group-hover:bg-violet-500/[0.035]">
+                <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.025] p-7 text-center transition-[border-color,background-color] duration-500 group-hover:border-violet-500/25 group-hover:bg-violet-500/[0.035]">
                   <h3 className="text-xl font-semibold text-white">
                     {step.title}
                   </h3>

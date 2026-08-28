@@ -15,35 +15,53 @@ export default function CTA() {
   const sectionRef = useGsapScroll<HTMLElement>((ctx, { scope, isReduced, gsap }) => {
     if (isReduced) return;
 
-    // CTA Box 3D perspective entrance
-    gsap.from(".cta-box-container", {
-      scrollTrigger: {
-        trigger: ".cta-box-container",
-        start: "top 82%",
-        toggleActions: "play none none reverse",
+    // CTA Box 3D perspective entrance (Two-Way)
+    gsap.fromTo(
+      ".cta-box-container",
+      {
+        opacity: 0,
+        scale: 0.96,
+        y: 35,
+        transformPerspective: 1000,
       },
-      opacity: 0,
-      scale: 0.93,
-      y: 45,
-      transformPerspective: 1000,
-      duration: 0.95,
-      ease: "power3.out",
-    });
+      {
+        scrollTrigger: {
+          trigger: ".cta-box-container",
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        opacity: 1,
+        scale: 1,
+        y: 0,
+        transformPerspective: 1000,
+        duration: 0.8,
+        ease: "power3.out",
+      }
+    );
 
-    // Content stagger
-    gsap.from(".cta-content-item", {
-      scrollTrigger: {
-        trigger: ".cta-box-container",
-        start: "top 80%",
-        toggleActions: "play none none reverse",
+    // Content stagger (Two-Way)
+    gsap.fromTo(
+      ".cta-content-item",
+      {
+        opacity: 0,
+        y: 20,
       },
-      opacity: 0,
-      y: 25,
-      stagger: 0.1,
-      duration: 0.7,
-      ease: "power2.out",
-      delay: 0.15,
-    });
+      {
+        scrollTrigger: {
+          trigger: ".cta-box-container",
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        opacity: 1,
+        y: 0,
+        stagger: 0.08,
+        duration: 0.6,
+        ease: "power2.out",
+        delay: 0.1,
+      }
+    );
 
     // Background glow scrub
     gsap.to(".cta-bg-glow", {

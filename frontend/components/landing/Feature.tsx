@@ -60,35 +60,52 @@ export default function Features() {
   const sectionRef = useGsapScroll<HTMLElement>((ctx, { scope, isReduced, gsap }) => {
     if (isReduced) return;
 
-    // Header reveal
-    gsap.from(".feature-section-header", {
-      scrollTrigger: {
-        trigger: scope,
-        start: "top 80%",
-        toggleActions: "play none none reverse",
-      },
-      opacity: 0,
-      y: 35,
-      duration: 0.8,
-      ease: "power2.out",
-    });
+    // Header reveal (Two-Way)
+    gsap.fromTo(
+      ".feature-section-header",
+      { opacity: 0, y: 30, scale: 0.98 },
+      {
+        scrollTrigger: {
+          trigger: scope,
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.7,
+        ease: "power2.out",
+      }
+    );
 
-    // Cards 3D staggered reveal
-    gsap.from(".feature-grid-card", {
-      scrollTrigger: {
-        trigger: ".feature-cards-grid",
-        start: "top 78%",
-        toggleActions: "play none none reverse",
+    // Cards 3D staggered reveal (Two-Way)
+    gsap.fromTo(
+      ".feature-grid-card",
+      {
+        opacity: 0,
+        y: 35,
+        scale: 0.97,
+        rotationX: 4,
+        transformPerspective: 1000,
       },
-      opacity: 0,
-      y: 45,
-      scale: 0.95,
-      rotationX: 5,
-      transformPerspective: 1000,
-      stagger: 0.1,
-      duration: 0.8,
-      ease: "power2.out",
-    });
+      {
+        scrollTrigger: {
+          trigger: ".feature-cards-grid",
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        rotationX: 0,
+        transformPerspective: 1000,
+        stagger: 0.08,
+        duration: 0.6,
+        ease: "power2.out",
+      }
+    );
 
     // Background glow subtle scrub
     gsap.to(".feature-bg-glow", {
@@ -143,7 +160,7 @@ export default function Features() {
             return (
               <div
                 key={feat.title}
-                className="feature-grid-card group relative rounded-2xl border border-white/10 bg-white/[0.025] p-7 transition-all duration-500 hover:-translate-y-2 hover:border-violet-500/30 hover:bg-violet-500/[0.04] hover:shadow-[0_20px_60px_rgba(124,58,237,0.12)]"
+                className="feature-grid-card group relative rounded-2xl border border-white/10 bg-white/[0.025] p-7 transition-[border-color,background-color,box-shadow] duration-500 hover:border-violet-500/30 hover:bg-violet-500/[0.04] hover:shadow-[0_20px_60px_rgba(124,58,237,0.12)]"
               >
                 {/* Hover glow */}
                 <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-violet-500/[0.08] via-transparent to-blue-500/[0.05] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />

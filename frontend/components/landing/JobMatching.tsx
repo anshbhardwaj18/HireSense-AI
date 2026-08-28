@@ -23,89 +23,141 @@ export default function JobMatching() {
   const sectionRef = useGsapScroll<HTMLElement>((ctx, { scope, isReduced, gsap }) => {
     if (isReduced) return;
 
-    // Header reveal
-    gsap.from(".job-matching-header", {
-      scrollTrigger: {
-        trigger: scope,
-        start: "top 82%",
-        toggleActions: "play none none reverse",
-      },
-      opacity: 0,
-      y: 35,
-      duration: 0.8,
-      ease: "power2.out",
-    });
+    // Header reveal (Two-Way)
+    gsap.fromTo(
+      ".job-matching-header",
+      { opacity: 0, y: 30, scale: 0.98 },
+      {
+        scrollTrigger: {
+          trigger: scope,
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.7,
+        ease: "power2.out",
+      }
+    );
 
-    // Left resume card 3D tilt entrance
-    gsap.from(".job-matching-left-card", {
-      scrollTrigger: {
-        trigger: ".job-matching-grid",
-        start: "top 78%",
-        toggleActions: "play none none reverse",
+    // Left resume card 3D tilt entrance (Two-Way)
+    gsap.fromTo(
+      ".job-matching-left-card",
+      {
+        opacity: 0,
+        x: -25,
+        rotationY: -4,
+        transformPerspective: 1000,
       },
-      opacity: 0,
-      x: -35,
-      rotationY: -5,
-      transformPerspective: 1000,
-      duration: 0.9,
-      ease: "power3.out",
-    });
+      {
+        scrollTrigger: {
+          trigger: ".job-matching-grid",
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        opacity: 1,
+        x: 0,
+        rotationY: 0,
+        transformPerspective: 1000,
+        duration: 0.8,
+        ease: "power3.out",
+      }
+    );
 
-    // Right job description card 3D tilt entrance
-    gsap.from(".job-matching-right-card", {
-      scrollTrigger: {
-        trigger: ".job-matching-grid",
-        start: "top 78%",
-        toggleActions: "play none none reverse",
+    // Right job description card 3D tilt entrance (Two-Way)
+    gsap.fromTo(
+      ".job-matching-right-card",
+      {
+        opacity: 0,
+        x: 25,
+        rotationY: 4,
+        transformPerspective: 1000,
       },
-      opacity: 0,
-      x: 35,
-      rotationY: 5,
-      transformPerspective: 1000,
-      duration: 0.9,
-      ease: "power3.out",
-    });
+      {
+        scrollTrigger: {
+          trigger: ".job-matching-grid",
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        opacity: 1,
+        x: 0,
+        rotationY: 0,
+        transformPerspective: 1000,
+        duration: 0.8,
+        ease: "power3.out",
+      }
+    );
 
-    // Center match indicator pop
-    gsap.from(".job-matching-badge-center", {
-      scrollTrigger: {
-        trigger: ".job-matching-grid",
-        start: "top 78%",
-        toggleActions: "play none none reverse",
+    // Center match indicator pop (Two-Way)
+    gsap.fromTo(
+      ".job-matching-badge-center",
+      {
+        opacity: 0,
+        scale: 0.7,
       },
-      opacity: 0,
-      scale: 0.5,
-      duration: 1,
-      ease: "back.out(1.8)",
-      delay: 0.2,
-    });
+      {
+        scrollTrigger: {
+          trigger: ".job-matching-grid",
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        opacity: 1,
+        scale: 1,
+        duration: 0.7,
+        ease: "back.out(1.4)",
+        delay: 0.1,
+      }
+    );
 
-    // Matching & Missing skills cards
-    gsap.from(".job-matching-results-card", {
-      scrollTrigger: {
-        trigger: ".job-matching-results-grid",
-        start: "top 82%",
-        toggleActions: "play none none reverse",
+    // Matching & Missing skills cards (Two-Way)
+    gsap.fromTo(
+      ".job-matching-results-card",
+      {
+        opacity: 0,
+        y: 25,
+        scale: 0.98,
       },
-      opacity: 0,
-      y: 35,
-      stagger: 0.15,
-      duration: 0.8,
-      ease: "power2.out",
-    });
+      {
+        scrollTrigger: {
+          trigger: ".job-matching-results-grid",
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        stagger: 0.1,
+        duration: 0.65,
+        ease: "power2.out",
+      }
+    );
 
-    // AI recommendation banner
-    gsap.from(".job-matching-recommendation-box", {
-      scrollTrigger: {
-        trigger: ".job-matching-recommendation-box",
-        start: "top 85%",
-        toggleActions: "play none none reverse",
+    // AI recommendation banner (Two-Way)
+    gsap.fromTo(
+      ".job-matching-recommendation-box",
+      {
+        opacity: 0,
+        y: 20,
       },
-      opacity: 0,
-      y: 30,
-      duration: 0.8,
-      ease: "power2.out",
-    });
+      {
+        scrollTrigger: {
+          trigger: ".job-matching-recommendation-box",
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        opacity: 1,
+        y: 0,
+        duration: 0.7,
+        ease: "power2.out",
+      }
+    );
 
     // Background glow scrub
     gsap.to(".job-matching-bg-glow", {

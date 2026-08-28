@@ -38,63 +38,59 @@ export default function Home() {
     });
 
     heroTl
-      .from(".hero-badge", {
-        opacity: 0,
-        y: 20,
-        scale: 0.95,
-        duration: 0.6,
-      })
-      .from(
+      .fromTo(
+        ".hero-badge",
+        { opacity: 0, y: 20, scale: 0.95 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.6 }
+      )
+      .fromTo(
         ".hero-title",
-        {
-          opacity: 0,
-          y: 40,
-          duration: 0.85,
-        },
+        { opacity: 0, y: 40 },
+        { opacity: 1, y: 0, duration: 0.85 },
         "-=0.4"
       )
-      .from(
+      .fromTo(
         ".hero-desc",
-        {
-          opacity: 0,
-          y: 25,
-          duration: 0.75,
-        },
+        { opacity: 0, y: 25 },
+        { opacity: 1, y: 0, duration: 0.75 },
         "-=0.5"
       )
-      .from(
+      .fromTo(
         ".hero-cta > *",
-        {
-          opacity: 0,
-          y: 20,
-          stagger: 0.12,
-          duration: 0.6,
-        },
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, stagger: 0.12, duration: 0.6 },
         "-=0.4"
       )
-      .from(
+      .fromTo(
         ".hero-check-item",
-        {
-          opacity: 0,
-          y: 15,
-          stagger: 0.08,
-          duration: 0.5,
-        },
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, stagger: 0.08, duration: 0.5 },
         "-=0.3"
       );
 
     // 2. Hero Right Card 3D Entrance
-    gsap.from(".hero-card-container", {
-      opacity: 0,
-      scale: 0.92,
-      rotationX: 8,
-      rotationY: -8,
-      transformPerspective: 1200,
-      y: 35,
-      duration: 1.1,
-      ease: "power3.out",
-      delay: 0.2,
-    });
+    gsap.fromTo(
+      ".hero-card-container",
+      {
+        opacity: 0,
+        scale: 0.92,
+        rotationX: 6,
+        rotationY: -6,
+        transformPerspective: 1200,
+        y: 35,
+      },
+      {
+        opacity: 1,
+        scale: 1,
+        rotationX: 0,
+        rotationY: 0,
+        transformPerspective: 1200,
+        y: 0,
+        duration: 1.1,
+        ease: "power3.out",
+        delay: 0.2,
+      }
+    );
 
     // 3. Hero Background Glow Parallax (Scrub)
     gsap.to(".hero-glow-1", {
@@ -122,35 +118,52 @@ export default function Home() {
       ease: "none",
     });
 
-    // 4. Features Section Header Scroll Animation
-    gsap.from(".features-header", {
-      scrollTrigger: {
-        trigger: "#features-intro",
-        start: "top 85%",
-        toggleActions: "play none none reverse",
-      },
-      opacity: 0,
-      y: 35,
-      duration: 0.8,
-      ease: "power2.out",
-    });
+    // 4. Features Section Header Scroll Animation (Two-Way)
+    gsap.fromTo(
+      ".features-header",
+      { opacity: 0, y: 30, scale: 0.98 },
+      {
+        scrollTrigger: {
+          trigger: "#features-intro",
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.7,
+        ease: "power2.out",
+      }
+    );
 
-    // 5. Feature Cards 3D Staggered Scroll Reveal
-    gsap.from(".feature-card-item", {
-      scrollTrigger: {
-        trigger: ".features-grid",
-        start: "top 82%",
-        toggleActions: "play none none reverse",
+    // 5. Feature Cards 3D Staggered Scroll Reveal (Two-Way)
+    gsap.fromTo(
+      ".feature-card-item",
+      {
+        opacity: 0,
+        y: 35,
+        scale: 0.97,
+        rotationX: 4,
+        transformPerspective: 1000,
       },
-      opacity: 0,
-      y: 50,
-      scale: 0.95,
-      rotationX: 5,
-      transformPerspective: 1000,
-      stagger: 0.1,
-      duration: 0.8,
-      ease: "power2.out",
-    });
+      {
+        scrollTrigger: {
+          trigger: ".features-grid",
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        rotationX: 0,
+        transformPerspective: 1000,
+        stagger: 0.1,
+        duration: 0.6,
+        ease: "power2.out",
+      }
+    );
   });
 
   // Attach subtle 3D mouse parallax to Hero Card on Desktop
@@ -352,7 +365,7 @@ export default function Home() {
           {/* Feature Cards */}
           <div className="features-grid mt-16 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {/* Card 1 */}
-            <div className="feature-card-item group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-7 transition-all duration-300 hover:-translate-y-2 hover:border-violet-500/30 hover:bg-white/[0.07]">
+            <div className="feature-card-item group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-7 transition-[border-color,background-color,box-shadow] duration-300 hover:border-violet-500/30 hover:bg-white/[0.07]">
               <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-violet-600/10 blur-3xl transition group-hover:bg-violet-600/20" />
 
               <div className="relative">
@@ -377,7 +390,7 @@ export default function Home() {
             </div>
 
             {/* Card 2 */}
-            <div className="feature-card-item group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-7 transition-all duration-300 hover:-translate-y-2 hover:border-blue-500/30 hover:bg-white/[0.07]">
+            <div className="feature-card-item group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-7 transition-[border-color,background-color,box-shadow] duration-300 hover:border-blue-500/30 hover:bg-white/[0.07]">
               <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-blue-600/10 blur-3xl transition group-hover:bg-blue-600/20" />
 
               <div className="relative">
@@ -402,7 +415,7 @@ export default function Home() {
             </div>
 
             {/* Card 3 */}
-            <div className="feature-card-item group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-7 transition-all duration-300 hover:-translate-y-2 hover:border-cyan-500/30 hover:bg-white/[0.07]">
+            <div className="feature-card-item group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-7 transition-[border-color,background-color,box-shadow] duration-300 hover:border-cyan-500/30 hover:bg-white/[0.07]">
               <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-cyan-600/10 blur-3xl transition group-hover:bg-cyan-600/20" />
 
               <div className="relative">
@@ -427,7 +440,7 @@ export default function Home() {
             </div>
 
             {/* Card 4 */}
-            <div className="feature-card-item group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-7 transition-all duration-300 hover:-translate-y-2 hover:border-emerald-500/30 hover:bg-white/[0.07]">
+            <div className="feature-card-item group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-7 transition-[border-color,background-color,box-shadow] duration-300 hover:border-emerald-500/30 hover:bg-white/[0.07]">
               <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-emerald-600/10 blur-3xl transition group-hover:bg-emerald-600/20" />
 
               <div className="relative">
@@ -452,7 +465,7 @@ export default function Home() {
             </div>
 
             {/* Card 5 */}
-            <div className="feature-card-item group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-7 transition-all duration-300 hover:-translate-y-2 hover:border-amber-500/30 hover:bg-white/[0.07]">
+            <div className="feature-card-item group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-7 transition-[border-color,background-color,box-shadow] duration-300 hover:border-amber-500/30 hover:bg-white/[0.07]">
               <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-amber-600/10 blur-3xl transition group-hover:bg-amber-600/20" />
 
               <div className="relative">
@@ -477,7 +490,7 @@ export default function Home() {
             </div>
 
             {/* Card 6 */}
-            <div className="feature-card-item group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-7 transition-all duration-300 hover:-translate-y-2 hover:border-rose-500/30 hover:bg-white/[0.07]">
+            <div className="feature-card-item group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-7 transition-[border-color,background-color,box-shadow] duration-300 hover:border-rose-500/30 hover:bg-white/[0.07]">
               <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-rose-600/10 blur-3xl transition group-hover:bg-rose-600/20" />
 
               <div className="relative">

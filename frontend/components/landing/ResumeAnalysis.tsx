@@ -28,106 +28,161 @@ export default function ResumeAnalysis() {
   const sectionRef = useGsapScroll<HTMLElement>((ctx, { scope, isReduced, gsap }) => {
     if (isReduced) return;
 
-    // Header reveal
-    gsap.from(".analysis-header", {
-      scrollTrigger: {
-        trigger: scope,
-        start: "top 82%",
-        toggleActions: "play none none reverse",
-      },
-      opacity: 0,
-      y: 35,
-      duration: 0.8,
-      ease: "power2.out",
-    });
+    // Header reveal (Two-Way)
+    gsap.fromTo(
+      ".analysis-header",
+      { opacity: 0, y: 30, scale: 0.98 },
+      {
+        scrollTrigger: {
+          trigger: scope,
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.7,
+        ease: "power2.out",
+      }
+    );
 
-    // 3D Dashboard Preview Container Entrance
-    gsap.from(".analysis-dashboard-preview", {
-      scrollTrigger: {
-        trigger: ".analysis-dashboard-preview",
-        start: "top 80%",
-        toggleActions: "play none none reverse",
+    // 3D Dashboard Preview Container Entrance (Two-Way)
+    gsap.fromTo(
+      ".analysis-dashboard-preview",
+      {
+        opacity: 0,
+        scale: 0.96,
+        rotationX: 4,
+        y: 35,
+        transformPerspective: 1200,
       },
-      opacity: 0,
-      scale: 0.94,
-      rotationX: 5,
-      y: 40,
-      transformPerspective: 1200,
-      duration: 1,
-      ease: "power3.out",
-    });
+      {
+        scrollTrigger: {
+          trigger: ".analysis-dashboard-preview",
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        opacity: 1,
+        scale: 1,
+        rotationX: 0,
+        y: 0,
+        transformPerspective: 1200,
+        duration: 0.85,
+        ease: "power3.out",
+      }
+    );
 
-    // ATS Score Count-Up & Dial Entrance
+    // ATS Score Count-Up & Dial Entrance (Two-Way)
     const counterObj = { val: 0 };
-    gsap.to(counterObj, {
-      scrollTrigger: {
-        trigger: ".analysis-score-card",
-        start: "top 78%",
-        toggleActions: "play none none reverse",
-      },
-      val: 87,
-      duration: 1.6,
-      ease: "power2.out",
-      onUpdate: () => {
-        if (scoreRef.current) {
-          scoreRef.current.innerText = Math.round(counterObj.val).toString();
-        }
-      },
-    });
+    gsap.fromTo(
+      counterObj,
+      { val: 0 },
+      {
+        scrollTrigger: {
+          trigger: ".analysis-dashboard-preview",
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        val: 87,
+        duration: 1.4,
+        ease: "power2.out",
+        onUpdate: () => {
+          if (scoreRef.current) {
+            scoreRef.current.innerText = Math.round(counterObj.val).toString();
+          }
+        },
+      }
+    );
 
-    gsap.from(".analysis-score-ring", {
-      scrollTrigger: {
-        trigger: ".analysis-score-card",
-        start: "top 78%",
-        toggleActions: "play none none reverse",
+    gsap.fromTo(
+      ".analysis-score-ring",
+      {
+        scale: 0.85,
+        rotation: -20,
+        opacity: 0,
       },
-      scale: 0.8,
-      rotation: -30,
-      opacity: 0,
-      duration: 1.2,
-      ease: "back.out(1.4)",
-    });
+      {
+        scrollTrigger: {
+          trigger: ".analysis-dashboard-preview",
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        scale: 1,
+        rotation: 0,
+        opacity: 1,
+        duration: 0.9,
+        ease: "back.out(1.2)",
+      }
+    );
 
-    // Stagger detected skills
-    gsap.from(".analysis-skill-tag", {
-      scrollTrigger: {
-        trigger: ".analysis-skills-card",
-        start: "top 78%",
-        toggleActions: "play none none reverse",
+    // Stagger detected skills (Two-Way)
+    gsap.fromTo(
+      ".analysis-skill-tag",
+      {
+        scale: 0.85,
+        opacity: 0,
       },
-      scale: 0.8,
-      opacity: 0,
-      stagger: 0.06,
-      duration: 0.5,
-      ease: "back.out(1.5)",
-    });
+      {
+        scrollTrigger: {
+          trigger: ".analysis-dashboard-preview",
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        scale: 1,
+        opacity: 1,
+        stagger: 0.05,
+        duration: 0.5,
+        ease: "back.out(1.2)",
+      }
+    );
 
-    // Stagger missing skills
-    gsap.from(".analysis-missing-skill-item", {
-      scrollTrigger: {
-        trigger: ".analysis-missing-skills-card",
-        start: "top 78%",
-        toggleActions: "play none none reverse",
+    // Stagger missing skills (Two-Way)
+    gsap.fromTo(
+      ".analysis-missing-skill-item",
+      {
+        x: 15,
+        opacity: 0,
       },
-      x: 20,
-      opacity: 0,
-      stagger: 0.1,
-      duration: 0.6,
-      ease: "power2.out",
-    });
+      {
+        scrollTrigger: {
+          trigger: ".analysis-dashboard-preview",
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        x: 0,
+        opacity: 1,
+        stagger: 0.08,
+        duration: 0.5,
+        ease: "power2.out",
+      }
+    );
 
-    // AI recommendation banner
-    gsap.from(".analysis-recommendation-box", {
-      scrollTrigger: {
-        trigger: ".analysis-recommendation-box",
-        start: "top 85%",
-        toggleActions: "play none none reverse",
+    // AI recommendation banner (Two-Way)
+    gsap.fromTo(
+      ".analysis-recommendation-box",
+      {
+        y: 20,
+        opacity: 0,
       },
-      y: 25,
-      opacity: 0,
-      duration: 0.8,
-      ease: "power2.out",
-    });
+      {
+        scrollTrigger: {
+          trigger: ".analysis-dashboard-preview",
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play reverse play reverse",
+        },
+        y: 0,
+        opacity: 1,
+        duration: 0.7,
+        ease: "power2.out",
+      }
+    );
 
     // Background glow scrub
     gsap.to(".analysis-bg-glow-1", {
