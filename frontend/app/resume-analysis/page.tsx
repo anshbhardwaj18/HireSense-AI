@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
+  ArrowLeft,
   Award,
   BriefcaseBusiness,
   CheckCircle2,
@@ -59,6 +60,7 @@ type AnalysisResponse = {
 function ResumeAnalysisContent() {
   const searchParams = useSearchParams();
   const resumeId = searchParams.get("resume_id");
+  const router = useRouter();
 
   const [analysis, setAnalysis] = useState<AnalysisResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -106,12 +108,6 @@ function ResumeAnalysisContent() {
             data.detail || "Failed to fetch resume analysis.",
           );
         }
-
-        console.log("ANALYSIS RESULT:", data.analysis_result);
-        console.log(
-          "SKILL GAP OBJECT:",
-          data.analysis_result?.skill_gep,
-        );
 
         setAnalysis(data);
       } catch (error) {
@@ -220,6 +216,14 @@ function ResumeAnalysisContent() {
         <div className="animate-[fadeIn_0.5s_ease-out]">
           <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
             <div>
+              <button
+                onClick={() => router.push("/dashboard/resume-analyzer")}
+                className="mb-4 inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-slate-300"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to Resume Analyzer
+              </button>
+
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-violet-500/20 bg-violet-500/[0.08] px-3 py-1.5 text-xs font-medium text-violet-300">
                 <Sparkles className="h-3.5 w-3.5" />
                 AI Resume Analysis
@@ -719,23 +723,6 @@ function ResumeAnalysisContent() {
 
       </div>
 
-      {/* =====================================================
-          ANIMATION
-      ===================================================== */}
-
-      <style jsx global>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </main>
   );
 }

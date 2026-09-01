@@ -104,8 +104,6 @@ export default function ResumeUpload() {
         throw new Error(data.detail || "Resume upload failed.");
       }
 
-      console.log("Resume uploaded successfully:", data);
-
       /*
        * Store backend response temporarily.
        * Dashboard will read this data after redirect.

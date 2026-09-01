@@ -299,9 +299,8 @@ function DashboardContent() {
 
             {/* Header Right */}
             <div className="ml-auto flex items-center gap-3">
-              <button className="relative rounded-xl border border-white/10 bg-white/[0.03] p-2.5 text-slate-400 transition hover:bg-white/[0.06] hover:text-white">
+              <button className="relative rounded-xl border border-white/10 bg-white/[0.03] p-2.5 text-slate-400 transition hover:bg-white/[0.06] hover:text-white" aria-label="Notifications">
                 <Bell className="h-5 w-5" />
-                <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-violet-400" />
               </button>
 
               {/* Profile */}
@@ -316,7 +315,7 @@ function DashboardContent() {
 
                   <div className="hidden text-left sm:block">
                     <p className="text-sm font-medium">{userName}</p>
-                    <p className="text-[11px] text-slate-600">Developer</p>
+                <p className="hidden text-sm text-slate-500 sm:block">Professional</p>
                   </div>
 
                   <ChevronDown
@@ -329,10 +328,10 @@ function DashboardContent() {
                 {profileOpen && (
                   <div className="absolute right-0 mt-3 w-52 overflow-hidden rounded-2xl border border-white/10 bg-slate-900 p-2 shadow-2xl shadow-black/40">
                     <Link
-                      href="/settings"
+                      href="/dashboard"
                       className="block rounded-xl px-3 py-2.5 text-sm text-slate-400 hover:bg-white/5 hover:text-white"
                     >
-                      Profile & Settings
+                      Go to Overview
                     </Link>
 
                     <div className="my-1 border-t border-white/10" />
@@ -480,14 +479,37 @@ function DashboardContent() {
                     </div>
 
                     <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/5">
-                      <div className="h-full w-[84%] rounded-full bg-gradient-to-r from-violet-500 to-blue-500" />
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-violet-500 to-blue-500"
+                        style={{ width: `${Math.min(resumeAnalysis?.ats_score ?? 0, 100)}%` }}
+                      />
                     </div>
 
                     <div className="mt-5 grid grid-cols-2 gap-3">
-                      <MiniMetric label="Keywords" value="92%" />
-                      <MiniMetric label="Formatting" value="88%" />
-                      <MiniMetric label="Skills" value="76%" />
-                      <MiniMetric label="Impact" value="81%" />
+                      <MiniMetric
+                        label="Skills detected"
+                        value={resumeAnalysis?.analysis_result?.skills?.length
+                          ? String(resumeAnalysis.analysis_result.skills.length)
+                          : "0"}
+                      />
+                      <MiniMetric
+                        label="Missing skills"
+                        value={resumeAnalysis?.analysis_result?.missing_skills?.length
+                          ? String(resumeAnalysis.analysis_result.missing_skills.length)
+                          : "0"}
+                      />
+                      <MiniMetric
+                        label="Strengths"
+                        value={resumeAnalysis?.analysis_result?.strengths?.length
+                          ? String(resumeAnalysis.analysis_result.strengths.length)
+                          : "0"}
+                      />
+                      <MiniMetric
+                        label="Suggestions"
+                        value={resumeAnalysis?.analysis_result?.suggestions?.length
+                          ? String(resumeAnalysis.analysis_result.suggestions.length)
+                          : "0"}
+                      />
                     </div>
                   </div>
                 </div>
@@ -508,12 +530,17 @@ function DashboardContent() {
               </div>
 
               <div className="mt-7 flex items-end justify-between">
-                <span className="text-4xl font-bold">67%</span>
-                <span className="text-xs text-slate-600">Keep going 🚀</span>
+                <span className="text-4xl font-bold">{jobReadiness}%</span>
+                <span className="text-xs text-slate-600">
+                  {jobReadiness >= 70 ? "Great progress 🚀" : jobReadiness >= 50 ? "Keep going 💪" : "Upload a resume to start"}
+                </span>
               </div>
 
               <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-white/5">
-                <div className="h-full w-[67%] rounded-full bg-gradient-to-r from-blue-500 to-cyan-400" />
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-blue-500 to-cyan-400"
+                  style={{ width: `${jobReadiness}%` }}
+                />
               </div>
 
               <div className="mt-7 space-y-4">
@@ -591,33 +618,33 @@ function DashboardContent() {
                   <p className="text-sm text-slate-600">Your activity</p>
                   <h3 className="mt-1 text-xl font-bold">Recent Activity</h3>
                 </div>
-
-                <button className="text-xs font-medium text-violet-400 hover:text-violet-300">
-                  View all
-                </button>
               </div>
 
-              <div className="mt-6 space-y-5">
-                <ActivityItem
-                  icon={<CheckCircle2 className="h-4 w-4" />}
-                  title="Resume analysis completed"
-                  subtitle="Your latest resume scored 84/100"
-                  time="2h ago"
-                />
-
-                <ActivityItem
-                  icon={<BriefcaseBusiness className="h-4 w-4" />}
-                  title="Job match completed"
-                  subtitle="78% compatibility with Software Developer"
-                  time="Yesterday"
-                />
-
-                <ActivityItem
-                  icon={<Upload className="h-4 w-4" />}
-                  title="Resume uploaded"
-                  subtitle="resume_v3.pdf"
-                  time="2d ago"
-                />
+              <div className="mt-6">
+                {resumeAnalysis ? (
+                  <div className="space-y-5">
+                    <ActivityItem
+                      icon={<CheckCircle2 className="h-4 w-4" />}
+                      title="Resume analysis completed"
+                      subtitle={`Your resume scored ${resumeAnalysis.ats_score ?? 0}/100`}
+                      time="Latest"
+                    />
+                    <ActivityItem
+                      icon={<Upload className="h-4 w-4" />}
+                      title="Resume uploaded"
+                      subtitle="Your resume was successfully analyzed by HireSense AI."
+                      time="Recent"
+                    />
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-10 text-center">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03]">
+                      <CheckCircle2 className="h-6 w-6 text-slate-600" />
+                    </div>
+                    <p className="mt-4 text-sm font-medium text-slate-400">No activity yet</p>
+                    <p className="mt-1 text-xs text-slate-600">Upload a resume to see your activity here.</p>
+                  </div>
+                )}
               </div>
             </div>
 

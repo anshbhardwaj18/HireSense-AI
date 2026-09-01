@@ -13,7 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
     title="HireSense AI API",
-    description="AI-powered carrer platforom API",
+    description="AI-powered career platform API",
     version="1.0.0"
 )
 app.add_middleware(
@@ -41,7 +41,7 @@ def check():
 @app.get("/")
 def root():
     return{
-        "message" : "Welome to the HireSense AI App",
+        "message" : "Welcome to the HireSense AI App",
         "Status" : "Running"
     }
 
