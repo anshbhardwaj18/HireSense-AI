@@ -50,10 +50,10 @@ def job_match(
     current_user: User = Depends(get_current_user)
 ):
     result = match_resume_with_job(
-        db,
-        data.resume_id,
-        data.job_description,
-        current_user
+        db=db,
+        resume_id=data.resume_id,
+        job_description=data.job_description,
+        current_user=current_user
     )
     return{
         "match_result": result

@@ -42,10 +42,11 @@ def register(
             detail=str(error)
         )
 
+
 @router.post("/login", response_model=TokenResponse)
 def login(
-    form_data : OAuth2PasswordRequestForm = Depends(),
-    db : Session = Depends(get_db)
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db)
 ):
     token = login_user(
         db,
@@ -55,31 +56,57 @@ def login(
 
     if not token:
         raise HTTPException(
-            status_code=401,
-            detail= "Invalid email and password"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password",
+            headers={"WWW-Authenticate": "Bearer"},
         )
     return {
-        "access_token" : token["access_token"],
-        "refresh_token" : token["refresh_token"],
-        "token_type" : "bearer"
+        "access_token": token["access_token"],
+        "refresh_token": token["refresh_token"],
+        "token_type": "bearer"
     }
+
+
+@router.post("/login-json", response_model=TokenResponse)
+def login_json(
+    credentials: LoginRequest,
+    db: Session = Depends(get_db)
+):
+    token = login_user(
+        db,
+        credentials.email,
+        credentials.password
+    )
+
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return {
+        "access_token": token["access_token"],
+        "refresh_token": token["refresh_token"],
+        "token_type": "bearer"
+    }
+
 
 @router.get("/me")
 def get_me(
-    current_user : User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
-    return{
-        "id" : current_user.id,
-        "full_name" : current_user.full_name,
-        "email" : current_user.email
+    return {
+        "id": current_user.id,
+        "full_name": current_user.full_name,
+        "email": current_user.email
     }
+
 
 @router.post("/refresh")
 def refresh_token(
     data: RefreshTokenRequest,
     db: Session = Depends(get_db)
 ):
-
     access_token = refresh_access_token(
         db,
         data.refresh_token
@@ -87,8 +114,9 @@ def refresh_token(
 
     if not access_token:
         raise HTTPException(
-            status_code=401,
-            detail="Invalid Refresh Token"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid Refresh Token",
+            headers={"WWW-Authenticate": "Bearer"},
         )
 
     return {

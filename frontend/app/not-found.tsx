@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Home, LayoutDashboard, Sparkles } from "lucide-react";
 
 export const metadata = {
-  title: "Page Not Found — HireSense AI",
+  title: "Page Not Found â€” HireSense AI",
   description: "The page you are looking for could not be found.",
 };
 

@@ -1,86 +1,81 @@
-version: "3.9"
 
 services:
 
   postgres:
     image: postgres:16-alpine
     container_name: hiresense-postgres
-
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: hiresense_db
-
     ports:
       - "5432:5432"
-
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d hiresense_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - hiresense-network
-
 
   redis:
     image: redis:7-alpine
     container_name: hiresense-redis
-
     ports:
       - "6379:6379"
-
     volumes:
       - redis_data:/data
-
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - hiresense-network
-
 
   backend:
     build:
       context: ./backend
-
     container_name: hiresense-backend
-
     ports:
       - "8000:8000"
-
     env_file:
       - .env
-
+    environment:
+      - DATABASE_URL=postgresql+psycopg://postgres:postgres@postgres:5432/hiresense_db
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     depends_on:
-      - postgres
-      - redis
-
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     volumes:
-      - ./backend:/app
-
+      - resume_uploads:/app/uploads/resumes
     networks:
       - hiresense-network
-  
+
   frontend:
     build:
       context: ./frontend
       args:
         NEXT_PUBLIC_API_URL: http://localhost:8000
-
     container_name: hiresense-frontend
-
     ports:
       - "3000:3000"
-
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
     depends_on:
       - backend
-
     networks:
       - hiresense-network
 
-
 volumes:
-
   postgres_data:
   redis_data:
-
+  resume_uploads:
 
 networks:
-
   hiresense-network:

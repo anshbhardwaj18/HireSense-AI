@@ -1,5 +1,25 @@
+# Environment
 .env
 *.env
+!.env.example
+
+# Python
 .venv/
+venv/
 __pycache__/
 *.pyc
+.pytest_cache/
+
+# Uploads
+uploads/
+backend/uploads/
+
+# Node & Next.js
+node_modules/
+frontend/node_modules/
+.next/
+frontend/.next/
+*.tsbuildinfo
+
+# Logs
+*.log

@@ -16,8 +16,9 @@ class ResumeAnalysisResponse(BaseModel):
     ats_score: int | None
     analysis_result: dict[str, Any] | None
 
-    class Config:
-        from_attributes = True
+    model_config = {
+        "from_attributes": True
+    }
 
 class JobMatchRequest(BaseModel):
     resume_id: int

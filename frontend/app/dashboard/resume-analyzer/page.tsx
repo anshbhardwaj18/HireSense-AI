@@ -31,7 +31,8 @@ type AnalysisResult = {
   suggestions?: string[];
   recommended_roles?: string[];
   interview_question?: string[];
-  skill_gep?: string[];
+  skill_gep?: (string | any)[];
+  skill_gap?: (string | any)[];
 };
 
 type ResumeAnalysis = {

@@ -23,7 +23,7 @@ Return this exact format:
     "suggestions": [],
     "recommended_roles": [],
     "interview_question": [],
-    "skill_gep": []
+    "skill_gap": []
 }}
 
 Resume:
@@ -32,12 +32,12 @@ Resume:
 
 def build_job_match_prompt(
         resume_text: str,
-        job_descripiton: str
-)-> str:
+        job_description: str
+) -> str:
     return f"""
-You are an expert Technical Recuriter and Job Matching AI.
+You are an expert Technical Recruiter and Job Matching AI.
 
-Compare the cadidate resume with the given job descripiton.
+Compare the candidate resume with the given job description.
 
 Analyze:
 - Skill match
@@ -58,7 +58,9 @@ Return this exact format:
    "missing_skills": [],
    "experience_match": "",
    "recommendation": "",
-   "improvement_suggestions": []
+   "improvement_suggestions": [],
+   "interview_question": [],
+   "skill_gap": []
 }}
 
 Resume:
@@ -67,5 +69,5 @@ Resume:
 
 Job Description:
 
-{job_descripiton}
+{job_description}
 """

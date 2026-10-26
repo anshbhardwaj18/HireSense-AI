@@ -43,8 +43,8 @@ type AnalysisResult = {
   recommended_roles?: string[];
   interview_question?: string[];
 
-  // Backend is returning objects for skill gap
-  skill_gep?: SkillGap[];
+  skill_gep?: (SkillGap | string)[];
+  skill_gap?: (SkillGap | string)[];
 };
 
 type AnalysisResponse = {
@@ -599,46 +599,54 @@ function ResumeAnalysisContent() {
 
           <div className="mt-6 grid gap-3 md:grid-cols-2">
 
-            {result?.skill_gep?.length ? (
-              result.skill_gep.map((gap, index) => (
-                <div
-                  key={index}
-                  className="rounded-xl border border-cyan-500/10 bg-cyan-500/[0.03] p-4 transition duration-300 hover:border-cyan-500/20 hover:bg-cyan-500/[0.06]"
-                >
+            {(() => {
+              const gaps = result?.skill_gap || result?.skill_gep;
+              if (gaps && gaps.length > 0) {
+                return gaps.map((gap, index) => {
+                  const isObj = typeof gap === "object" && gap !== null;
+                  const skillName = isObj ? (gap as SkillGap).skill : String(gap);
+                  const proficiency = isObj && (gap as SkillGap).proficiency ? (gap as SkillGap).proficiency : null;
+                  const years = isObj ? (gap as SkillGap).years : null;
 
-                  {/* Skill */}
+                  return (
+                    <div
+                      key={index}
+                      className="rounded-xl border border-cyan-500/10 bg-cyan-500/[0.03] p-4 transition duration-300 hover:border-cyan-500/20 hover:bg-cyan-500/[0.06]"
+                    >
+                      <p className="text-sm font-medium text-cyan-300">
+                        {skillName}
+                      </p>
 
-                  <p className="text-sm font-medium text-cyan-300">
-                    {gap.skill}
-                  </p>
+                      <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-gray-500">
+                        {proficiency && (
+                          <span>
+                            Proficiency:{" "}
+                            <span className="font-medium text-gray-300">
+                              {proficiency}
+                            </span>
+                          </span>
+                        )}
 
-                  {/* Details */}
-
-                  <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-gray-500">
-
-                    <span>
-                      Proficiency:{" "}
-                      <span className="font-medium text-gray-300">
-                        {gap.proficiency}
-                      </span>
-                    </span>
-
-                    <span>
-                      Experience:{" "}
-                      <span className="font-medium text-gray-300">
-                        {gap.years}{" "}
-                        {gap.years === 1 ? "year" : "years"}
-                      </span>
-                    </span>
-
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-gray-500">
-                No skill gap information available.
-              </p>
-            )}
+                        {years !== null && years !== undefined && (
+                          <span>
+                            Experience:{" "}
+                            <span className="font-medium text-gray-300">
+                              {years}{" "}
+                              {years === 1 ? "year" : "years"}
+                            </span>
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                });
+              }
+              return (
+                <p className="text-sm text-gray-500">
+                  No skill gap information available.
+                </p>
+              );
+            })()}
 
           </div>
         </section>

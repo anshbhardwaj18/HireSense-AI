@@ -78,11 +78,7 @@ export default function ResumeUpload() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
-      if (!apiUrl) {
-        throw new Error("API URL is not configured.");
-      }
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
       const response = await fetch(`${apiUrl}/resume/upload`, {
         method: "POST",

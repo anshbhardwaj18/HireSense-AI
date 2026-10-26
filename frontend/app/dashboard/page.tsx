@@ -40,7 +40,8 @@ type AnalysisResult = {
   suggestions?: string[];
   recommended_roles?: string[];
   interview_question?: string[];
-  skill_gep?: string[];
+  skill_gep?: (string | any)[];
+  skill_gap?: (string | any)[];
 };
 
 type ResumeAnalysis = {
@@ -694,25 +695,27 @@ function DashboardContent() {
                     </p>
 
                     <div className="mt-2 space-y-1">
-                      {resumeAnalysis?.analysis_result?.skill_gep?.length ? (
-                        resumeAnalysis.analysis_result.skill_gep
-                          .slice(0, 3)
-                          .map((gap, index) => (
-                            <p
-                              key={index}
-                              className="text-xs leading-5 text-slate-500"
-                            >
-                              •{" "}
-                              {typeof gap === "string"
-                                ? gap
-                                : JSON.stringify(gap)}
-                            </p>
-                          ))
-                      ) : (
-                        <p className="text-xs leading-5 text-slate-500">
-                          Upload a resume to identify your skill gaps.
-                        </p>
-                      )}
+                      {(() => {
+                        const gaps = resumeAnalysis?.analysis_result?.skill_gap || resumeAnalysis?.analysis_result?.skill_gep;
+                        if (gaps && gaps.length > 0) {
+                          return gaps.slice(0, 3).map((gap, index) => {
+                            const label = typeof gap === "object" && gap !== null ? (gap as any).skill || JSON.stringify(gap) : String(gap);
+                            return (
+                              <p
+                                key={index}
+                                className="text-xs leading-5 text-slate-500"
+                              >
+                                • {label}
+                              </p>
+                            );
+                          });
+                        }
+                        return (
+                          <p className="text-xs leading-5 text-slate-500">
+                            Upload a resume to identify your skill gaps.
+                          </p>
+                        );
+                      })()}
                     </div>
                   </div>
                 </div>
